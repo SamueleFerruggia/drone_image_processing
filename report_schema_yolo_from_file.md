@@ -66,17 +66,50 @@ Valutata come tecnica ausiliaria per oggetti sottili (es. cavi). La pipeline pri
 ## Dataset
 - **ds1 (vegetazione chiara)**: immagini eterogenee; labeling su **Roboflow** fatto da **3 persone** (suddivisione delle immagini).
 - **ds2 (vegetazione scura)**: nuova raccolta; labeling **centralizzato** da **1 persona** per uniformare criteri e classi (stessa tassonomia).
+### Roboflow
+### Creazione dataset con Roboflow
+Un passaggio preliminare e fondamentale per l'addestramento del modello di object detection è consistito nella creazione e preparazione di un dataset specifico. Per la gestione, l'augmentation e la formattazione di tale dataset è stata utilizzata la piattaforma Roboflow.
+Il dataset, composto da un insieme di immagini sorgente, opportunamente convertite in formato .jpeg, ha richiesto una fase di annotazione manuale. Con questo termine si indica il processo di etichettatura dei dati, che nel caso specifico consiste nel tracciare dei bounding box, rettangoli di delimitazione, attorno agli oggetti di interesse e nell'associare a ciascuno di essi una classe predefinita.
+Data la scelta di utilizzare un modello della famiglia YOLO, è stato adottato lo standard di annotazione YOLO PyTorch TXT.
+Questo formato prevede che a ogni immagine del dataset sia associato un file di testo con lo stesso nome. All'interno di tale file, ogni riga corrisponde a un singolo un bounding box presente nell'immagine.
+La struttura di ogni riga è la seguente:
+- <class_id> <x_center> <y_center> < width > < height >
 
-### Creazione dataset con Yolo
-Esportazione da Roboflow in formato **YOLO** (`images/`, `labels/`, `data.yaml`).
+Dove i parametri sono così definiti:
+- <class_id>: Un identificatore numerico intero, a partire da 0, che rappresenta la classe dell'oggetto
+- <x_center>: La coordinata X del centro del bounding box.
+- <y_center>: La coordinata Y del centro del bounding box.
+- < width >: La larghezza del bounding box.
+- < height >: L'altezza del bounding box.
+
+```
+Esempio img_1.txt:
+1 0.617 0.3594420600858369 0.114 0.17381974248927037
+1 0.094 0.38626609442060084 0.156 0.23605150214592274
+1 0.295 0.3959227467811159 0.13 0.19527896995708155
+```
+
+Per l'addestramento e la valutazione del modello, il dataset è stato suddiviso in due sottoinsiemi distinti, seguendo una ripartizione 80% per il Training Set e 20% per il Validation Set. Il primo insieme, che comprende l'80% delle immagini annotate, viene utilizzato dal modello durante la fase di addestramento per apprendere a riconoscere gli oggetti di interesse. Il restante 20%, il Validation Set, non viene usato per l'addestramento ma serve per validare le prestazioni del modello al termine di ogni epoca, permettendo così di monitorare l'apprendimento e identificare potenziali fenomeni di overfitting. 
+Oltre ai singoli file di annotazione .txt, il dataset finale è organizzato in una struttura di cartelle specifica, governata da un file di configurazione in formato .yaml.
+Il file è un componente critico che funge da "indice" per il modello: esso contiene le informazioni necessarie per localizzare i dati e interpretare correttamente le annotazioni. Nello specifico, il suo contenuto definisce due elementi chiave: i percorsi che specificano le directory contenenti le immagini di training e validation, e la mappatura delle classi. Quest'ultima è fondamentale perché fornisce l'elenco dei nomi delle classi in un formato leggibile, creando il collegamento tra i class_id numerici (es. 0, 1) utilizzati nei file .txt e il loro significato semantico. In sintesi, il file .yaml indica al modello dove trovare i dati di addestramento e validazione e come interpretare le etichette numeriche presenti nei file di annotazione.
+
+```
+Esempio data.yaml:
+    train: ../train/images
+    val: ../valid/images
+
+    nc: 3
+    names: ['tree', 'bush', 'powerline']
+
+```
 
 ### Parametri dataset (dimensione pixels)
 - **imgsz**: **1024** (train/val)
 - **batch**: **8**
 - Resize/letterbox gestiti da Ultralytics in fase di training.
 
-### Roboflow
-Progetto condiviso; linee guida d’etichettatura e QA a campione prima del training (raccomandato ≥10–20%).
+
+
 
 ## Yolo
 YOLO (You Only Look Once) è un'affermata architettura computazionale per l'object detection e l'image segmentation. La sua adozione negli ultimi anni ha registrato un incremento esponenziale, in virtù delle sue elevate prestazioni in termini di velocità e accuratezza.
