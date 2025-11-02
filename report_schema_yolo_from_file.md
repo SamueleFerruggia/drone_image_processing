@@ -16,41 +16,6 @@ Il lavoro si conclude con una riflessione sui possibili sviluppi futuri di quest
 
 ### Risultati
 
-**Figure principali**
-
-![](report_assets/report_assets/ds1_PR_curve.png)
-
-![](report_assets/report_assets/ds1_F1_curve.png)
-
-![](report_assets/report_assets/ds1_P_curve.png)
-
-![](report_assets/report_assets/ds1_R_curve.png)
-
-![](report_assets/report_assets/ds1_confusion_matrix.png)
-
-![](report_assets/report_assets/ds1_confusion_matrix_normalized.png)
-
-![](report_assets/report_assets/ds1_val_batch0_labels.jpg)
-
-![](report_assets/report_assets/ds1_val_batch0_pred.jpg)
-
-![](report_assets/report_assets/ds2_PR_curve.png)
-
-![](report_assets/report_assets/ds2_F1_curve.png)
-
-![](report_assets/report_assets/ds2_P_curve.png)
-
-![](report_assets/report_assets/ds2_R_curve.png)
-
-![](report_assets/report_assets/ds2_confusion_matrix.png)
-
-![](report_assets/report_assets/ds2_confusion_matrix_normalized.png)
-
-![](report_assets/report_assets/ds2_val_batch0_labels.jpg)
-
-![](report_assets/report_assets/ds2_val_batch0_pred.jpg)
-
-
 ### Altro
 —
 
@@ -124,13 +89,11 @@ Nel contesto del presente elaborato, si è scelto di impiegare tale modello per 
 La metodologia standard per l'impiego di YOLO prevede l'utilizzo di piattaforme cloud come Google Colab o di un sistema operativo basato su Linux, necessari per le fasi di training e per la successiva inferenza.
 Si è quindi proceduto a condurre un'analisi comparativa tra queste due metodologie operative. L'obiettivo è determinare quale delle due soluzioni risulti più efficiente, valutando parametri quali le tempistiche di elaborazione e l'accuratezza dei risultati finali ottenuti.
 
-### Prima analisi del dataset (10 epoche)
-
-### Utilizzo di WSL
+## Utilizzo di WSL
 Per quanto concerne l'impiego di YOLO in un ambiente Linux, si è optato per l'utilizzo di Windows Subsystem for Linux (WSL). Tale sottosistema consente un'efficace integrazione di un ambiente GNU/Linux all'interno del sistema operativo Windows, offrendo come vantaggio primario la possibilità di sfruttare l'accelerazione hardware della GPU dedicata NVIDIA. Questo permette l'utilizzo della piattaforma CUDA senza la necessità di complesse configurazioni di driver aggiuntivi, tipiche delle macchine virtuali tradizionali.
 Per la realizzazione del progetto, il modello selezionato è stato YOLOv11, gestito tramite la libreria Ultralytics. Nello specifico, si è impiegata la variante yolov11s . Questa scelta è motivata dal fatto che tale modello rappresenta un eccellente compromesso tra stabilità, velocità di inferenza e accuratezza computazionale tra le versioni disponibili.
+### Prima analisi del dataset (10 epoche)
 In questa prima fase di training del modello abbiamo deciso di utilizzare un dataset, da noi chiamato POWLINE, che presentava le seguenti instances: 
-
 - `powerline`: 94 istanze
 - `trees`: 43 istanze
 - `bushes`: 34 istanze
@@ -169,7 +132,6 @@ Durante il training abbiamo diversi indicatori che ci danno delucidazioni su cos
     - mAP50-95: precisione media su più livelli di sovrapposione
  
 durante l’addestramento dalla prima alla decima epoca abbiao avuto: 
-
 - miglioramento dell’mAP50: passaggio dal 3% al 67,9%
 - miglioramento dell’mAP50-95: passaggio dall’1,7% al 39,8%
 - Precision: 73%
@@ -217,14 +179,44 @@ Anche la classe powerline tower, che ricordiamo avere solamente poche istanze al
 
 L'analisi di quest'ultimo ciclo di addestramento porta a una duplice conclusione. In primo luogo, emerge con chiarezza come il limite prestazionale riscontrato su determinate classi sia direttamente correlato all'esiguità delle istanze presenti nel dataset. In secondo luogo, i risultati dimostrano l'importanza cruciale dell'addestramento prolungato: l'impiego di un maggior numero di epoche ha fornito un contributo significativo al training finale. Questo ha permesso al modello di affinare progressivamente le sue capacità di rilevamento e localizzazione, con classi che hanno mostrato un perfezionamento metrico quasi a ogni epoca successiva.
 
+## Utilizzo di Colab
+-
+**Figure principali**
+
+![](report_assets/report_assets/ds1_PR_curve.png)
+
+![](report_assets/report_assets/ds1_F1_curve.png)
+
+![](report_assets/report_assets/ds1_P_curve.png)
+
+![](report_assets/report_assets/ds1_R_curve.png)
+
+![](report_assets/report_assets/ds1_confusion_matrix.png)
+
+![](report_assets/report_assets/ds1_confusion_matrix_normalized.png)
+
+![](report_assets/report_assets/ds1_val_batch0_labels.jpg)
+
+![](report_assets/report_assets/ds1_val_batch0_pred.jpg)
+
+![](report_assets/report_assets/ds2_PR_curve.png)
+
+![](report_assets/report_assets/ds2_F1_curve.png)
+
+![](report_assets/report_assets/ds2_P_curve.png)
+
+![](report_assets/report_assets/ds2_R_curve.png)
+
+![](report_assets/report_assets/ds2_confusion_matrix.png)
+
+![](report_assets/report_assets/ds2_confusion_matrix_normalized.png)
+
+![](report_assets/report_assets/ds2_val_batch0_labels.jpg)
+
+![](report_assets/report_assets/ds2_val_batch0_pred.jpg)
+
 ## Confronto Colab e Linux
 —
-
-
-### Creazione secondo dataset
--
-
-### Creazione prompt ottimale per l’addestramento
 -
 ```bash
 # Dataset 1
@@ -234,22 +226,18 @@ yolo detect train   model=yolo11s.pt data=/content/datasets/Powerlines-Detection
 yolo detect train   model=yolo11s.pt data=/content/datasets/Powerline-detection-V2.0---YOLO-3/data.yaml   imgsz=1024 batch=8 epochs=200 patience=50 mosaic=0.2 fliplr=0.5 erasing=0.4   project=runs/detect name=train_ds2
 ```
 
-### Metodologie possibili
+## Metodologie possibili per l'object detection
 - **Detection + Edge/Hough** come post-processing per strutture sottili.
 - **Self-training / pseudo-label** su immagini non etichettate.
 - **Cross-dataset** (ds2 su immagini ds1 e viceversa) per valutare la generalizzazione.
 
-## Confronto finale
+## Confronto finale                        
 | Metrica (best val) | Dataset 1 | Dataset 2 | Δ (ds2−ds1) |
 |---|---:|---:|---:|
 | Precision | 84.1% | 99.6% | +15.5 pp |
 | Recall    | 72.2% | 100.0% | +27.8 pp |
 | mAP@50    | 75.5% | 99.5% | +24.0 pp |
 | mAP@50–95 | 48.3% | 74.7% | +26.4 pp |
-
-### Confronto risultati ottenuti
-- ds2 supera ds1 su tutte le metriche.
-- Raccomandati controlli su leakage/duplicati e split per scena.
 
 
 ## Stima altezza
