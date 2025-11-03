@@ -131,7 +131,7 @@ Durante il training abbiamo diversi indicatori che ci danno delucidazioni su cos
     - mAP50: precisione media con una sovrapposizione del 50%
     - mAP50-95: precisione media su più livelli di sovrapposione
  
-durante l’addestramento dalla prima alla decima epoca abbiao avuto: 
+durante l’addestramento dalla prima alla decima epoca abbiamo avuto: 
 - miglioramento dell’mAP50: passaggio dal 3% al 67,9%
 - miglioramento dell’mAP50-95: passaggio dall’1,7% al 39,8%
 - Precision: 73%
@@ -180,7 +180,80 @@ Anche la classe powerline tower, che ricordiamo avere solamente poche istanze al
 L'analisi di quest'ultimo ciclo di addestramento porta a una duplice conclusione. In primo luogo, emerge con chiarezza come il limite prestazionale riscontrato su determinate classi sia direttamente correlato all'esiguità delle istanze presenti nel dataset. In secondo luogo, i risultati dimostrano l'importanza cruciale dell'addestramento prolungato: l'impiego di un maggior numero di epoche ha fornito un contributo significativo al training finale. Questo ha permesso al modello di affinare progressivamente le sue capacità di rilevamento e localizzazione, con classi che hanno mostrato un perfezionamento metrico quasi a ogni epoca successiva.
 
 ## Utilizzo di Colab
--
+Se l'ambiente WSL è stato impiegato per un'analisi preliminare e per validare l'impatto di un addestramento prolungato (da 10 a 150 epoche) a risoluzione standard, l'ambiente cloud Google Colab è stato scelto per la fase di addestramento finale e il confronto sistematico dei dataset.
+
+L'adozione di Colab, e in particolare delle sue istanze con GPU NVIDIA (come la Tesla T4), ha offerto due vantaggi strategici:
+
+### Potenza Computazionale 
+La capacità di eseguire addestramenti estesi (200 epoche) con immagini ad alta risoluzione (imgsz=1024), un carico di lavoro che sarebbe stato eccessivamente oneroso per l'hardware locale.
+
+### Riproducibilità e Integrazione
+ Un ambiente notebook standardizzato, perfettamente integrato con la piattaforma Roboflow per il download e la gestione dei dataset.
+
+### Configurazione dell'Ambiente Colab
+A differenza della configurazione manuale di WSL, l'ambiente Colab è stato preparato tramite l'installazione diretta delle librerie necessarie all'interno del notebook:
+
+Installazione delle dipendenze:
+
+```
+
+%pip install "ultralytics<=8.3.40" supervision roboflow
+```
+Disattivazione tracking (opzionale):
+```
+!yolo settings sync=False
+```
+Integrazione con Roboflow e Download Dataset: L'acquisizione dei dati è stata gestita programmaticamente, connettendosi a Roboflow tramite API key e scaricando la versione specifica del dataset (version 3). Questo approccio garantisce la totale riproducibilità degli esperimenti.
+
+```
+from roboflow import Roboflow
+rf = Roboflow(api_key="YOUR_API_KEY")
+project = rf.workspace("yolo-q4za7").project("powerline-detection-v2-0-yolo-oh4ia")
+version = project.version(3)
+dataset = version.download("yolov11")
+```
+### Addestramento Finale Ottimizzato (ds2)
+L'addestramento su Colab è stato il culmine del processo di ottimizzazione. Sulla base delle analisi preliminari, è stato utilizzato il modello yolo11s.pt ma con un prompt di addestramento significativamente più complesso e ottimizzato, mirato a massimizzare l'accuratezza con immagini ad alta risoluzione.
+
+Il comando seguente mostra la configurazione finale, che include non solo un numero elevato di epoche, ma anche iperparametri specifici per l'ottimizzatore e un pesante ricorso alla data augmentation:
+
+
+```
+!yolo task=detect mode=train \
+  data={dataset.location}/data.yaml \
+  model=yolo11s.pt \
+  epochs=200 imgsz=1024 batch=8 \
+  optimizer=AdamW lr0=0.001 lrf=0.01 cos_lr=True warmup_epochs=3 patience=50 \
+  box=7.5 cls=1.2 dfl=1.5 \
+  hsv_h=0.015 hsv_s=0.4 hsv_v=0.2 \
+  degrees=0.0 translate=0.05 scale=0.15 shear=0.0 perspective=0.0 \
+  fliplr=0.5 mosaic=0.2 mixup=0.0 copy_paste=0.0 close_mosaic=15 \
+  amp=True plots=True val=True \
+  project=runs/detect name=train_powerline_v2
+```
+L'analisi di questo comando rivela scelte mirate:
+
+epochs=200 imgsz=1024: Addestramento esteso su immagini ad alta risoluzione per catturare dettagli fini come i cavi sottili.
+
+optimizer=AdamW...: Utilizzo di un ottimizzatore più avanzato (AdamW) con un learning rate schedule specifico (cos_lr=True) per una convergenza più stabile.
+
+hsv_... fliplr... mosaic...: Applicazione intensiva di data augmentation, come descritto nella sezione Roboflow, per aumentare la robustezza del modello a diverse condizioni di illuminazione e angolazione.
+
+patience=50: Impostazione di un meccanismo di early stopping per interrompere l'addestramento se le prestazioni non migliorano per 50 epoche, ottimizzando i tempi.
+
+Analisi dei Risultati di Training
+Questo addestramento ottimizzato, applicato al Dataset 2 (labeling centralizzato), ha prodotto i risultati quantitativi discussi nel report. Le metriche e i grafici di performance (visibili nelle "Figure principali") e i dati della tabella di "Confronto finale" derivano direttamente da questa esecuzione su Colab.
+
+Come le metriche dimostrano in modo inconfutabile, questa configurazione ha portato a performance di eccellenza:
+
+mAP@50: 99.5%
+
+mAP@50-95: 74.7%
+
+Recall: 100.0%
+
+Il confronto con i risultati del ds1 (addestrato nel medesimo ambiente Colab) conferma la tesi centrale: l'effetto combinato di un dataset di alta qualità (ds2) e di un addestramento iper-parametrizzato ad alta risoluzione (reso possibile da Colab) è stato determinante per superare le criticità iniziali (come la bassa mAP@50-95 per le powerline) e raggiungere un livello di accuratezza operativa.
+
 **Figure principali**
 
 ![](report_assets/report_assets/ds1_PR_curve.png)
