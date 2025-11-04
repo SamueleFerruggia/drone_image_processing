@@ -3,21 +3,57 @@
 Questo lavoro di tesi affronta l'analisi dei rischi in prossimità delle linee elettriche ad alta tensione, utilizzando immagini aeree acquisite da droni. L'intera metodologia si fonda sull'applicazione di Computer Vision e Machine Learning per automatizzare il rilevamento dei pericoli.
 Il percorso della tesi segue due approcci principali. Inizialmente, vengono esplorate tecniche di Computer Vision tradizionali, come l'edge detection, per identificare i cavi elettrici in contesti complessi come quelli boschivi; questa sezione include un'analisi delle matrici e dei filtri utilizzati e i risultati conseguiti.
 Successivamente, il focus si sposta su una pipeline di Object Detection. Questa parte inizia con una disamina approfondita dei dataset impiegati per l'addestramento, definendone i parametri chiave e descrivendo l'uso dello strumento di annotazione Roboflow. Si procede poi con la scelta del modello basato sulla libreria YOLO, includendo un'analisi preliminare che ne confronta l'implementazione su Google Colab e su un sistema Linux.
-Una fase cruciale del progetto è stata l'ottimizzazione dei parametri di addestramento e la preparazione del dataset, finalizzata a ottenere un livello di accuratezza adeguato al contesto operativo. 
+Una fase cruciale del progetto è stata l'ottimizzazione dei parametri di addestramento e la preparazione del dataset, finalizzata a ottenere un livello di accuratezza adeguato al contesto operativo.
 La parte finale della tesi è dedicata a un'analisi comparativa: vengono messi a confronto i risultati ottenuti da due diverse tipologie di dataset, testati utilizzando una configurazione di rilevamento stabile.
 Il lavoro si conclude con una riflessione sui possibili sviluppi futuri di questo approccio.
 
-## Tecnica computer vision: Edge detection
+## Computer Vision: Edge detection
+
+L'obiettivo iniziale del progetto è stato individuare i cavi dell'alta tensione (powerline) in immagini scattate da droni in area boschiva, sfruttando algoritmi di Edge Detection per estrarre i dettagli più sottili (ovvero linee bianche, sottili sullo sfondo).
+La pipeline utilizzata prevede più passaggi, ciascuno al fine di migliorare l'illuminazione, la robustezza rispetto al rumore, e aumentare il contrasto tra le powerline e lo sfondo.
 
 ### Matrice utilizzata
-—
+
+Per l'individuazione dei bordi sono state usate matrici di convoluzione che calcolano i gradienti di intensità dell'immagine, di cui la più importante è la matrice della **Canny Edge Detection**, preceduta da un filtro di smoothing Gaussiano usato per ridurre il rumore prima della edge detection.
 
 ### Tecniche
 
+1. **Conversione in scala di grigi** : Per semplificare il processo di riduzione e dipendenza dai colori, si converte l'immagine in grigio
+
+```python
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+```
+
+2. **Smoothing / Gaussian Blur** : Fondamentale per ridurre rischi di false rilevazioni dovute al rumore
+
+```python
+blurred = cv2.GaussianBlur(gray, (3, 3), 0.8)
+```
+
+3. **Edge Detection: Operatore di Canny** : il punto cardine della pipeline. L'algoritmo di Canny è stato scelto per la robustezza al rumore, la precisione su linee sottili e la possibilità di regolare le soglie di threshold superiori ed inferiori.
+
+```python
+edges = cv2.Canny(blurred, 25, 75, apertureSize=3, L2gradient=True)
+```
+
+- Soglie 25-75 favoriscono il rilevamento di segni sottili, penalizzando il fondo naturale
+- apertureSize=3 indica il kernel Sobel 3x3 interno
+- L2gradient=True assicura che la magnitudo del gradiente sia calcolata in maniera precisa
+
+4. **Post-Processing** : l'ultimo passaggio facoltativo è quello di unire le parti di linea discontinua tramite dilatazione e chiusura
+
+```python
+kernel = np.ones((2, 2), np.uint8)
+final_edges = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel, iterations=1)
+```
+
 ### Risultati
 
-### Altro
-—
+L'applicazione della pipeline ha restituito mappe di edge precise dove i cavi sono rappresentati da tratti continui, mentre lo sfondo e le strutture vegetali vengono in gran parte attenuati. La scelta di soglie base nel Canny e un kernel Gaussiano piccolo è risultata ottimale per mantenere sensibilità ai dettagli sottili, tipici dei cavi dell'alta tensione.
+
+![](./Edge%20Detection/output/train/OUTPUT_0_TIFF_TO_JPG/_DSC4207_original.jpg)
+
+![](./Edge%20Detection/output/train/FILTER_6_FINAL_EDGES/_DSC4207_final.jpg)
 
 ## Dataset
 - **ds1 (vegetazione chiara)**: immagini eterogenee; labeling su **Roboflow** fatto da **3 persone** (suddivisione delle immagini).
