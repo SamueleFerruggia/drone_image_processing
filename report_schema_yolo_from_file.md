@@ -480,8 +480,19 @@ Errori Visibili: Nell'immagine in alto a sinistra, le labels mostrano due istanz
 powerline tower (box ciano-verde): Nell'immagine in alto (seconda da sinistra), il traliccio viene rilevato con confidenza massima (powerline tower 1.0), ma sappiamo dalle metriche che il modello non è così consistente, mancando il 44% di questa classe.
 
 ## Confronto Colab e Linux
-—
--
+Per questo progetto, la pipeline di addestramento è stata implementata su due ambienti distinti, Windows Subsystem for Linux (WSL) e Google Colab, che hanno ricoperto ruoli diversi ma complementari.
+
+L'ambiente WSL è stato impiegato per la fase di analisi preliminare e proof-of-concept. Il suo vantaggio primario è la capacità di sfruttare l'accelerazione hardware della GPU NVIDIA locale in un ambiente Linux integrato, senza la complessità di una virtual machine. Questo setup, sebbene richieda una configurazione manuale più complessa (creazione di ambienti virtuali, installazione di dipendenze CUDA), si è rivelato ideale per i primi test a risoluzione standard (imgsz=640). Le esecuzioni a 10 e 150 epoche su WSL sono state cruciali per una diagnosi iniziale, confermando la rapida capacità di apprendimento del modello e l'importanza critica di un addestramento prolungato per migliorare le metriche (es. mAP50-95 passata da 39.8% a 50.7%).
+
+Google Colab, al contrario, è stato scelto come ambiente per la fase di addestramento finale e ottimizzata. I suoi vantaggi strategici sono stati determinanti:
+
+Potenza Computazionale: Colab ha fornito accesso a GPU ad alte prestazioni (es. Tesla T4) che hanno reso possibile l'addestramento ad alta risoluzione (imgsz=1024) per 200 epoche. Questo carico di lavoro era considerato "proibitivo" per l'hardware locale utilizzato con WSL.
+
+Facilità di Configurazione e Riproducibilità: L'ambiente Colab ha richiesto un setup minimo (installazione via pip) ed ha permesso un'integrazione programmatica diretta con Roboflow, garantendo una maggiore standardizzazione e riproducibilità degli esperimenti finali.
+
+In sintesi, mentre WSL è servito come ambiente di sviluppo e validazione iniziale per esperimenti rapidi a bassa risoluzione, Colab è stato l'ambiente di "produzione" che ha permesso di eseguire gli addestramenti finali, computazionalmente intensivi e ad alta risoluzione, necessari per il confronto sistematico dei dataset e la generazione dei risultati definitivi del progetto.
+
+Abbiamo iniziato con un esperimento a 10 epoche per capire i parametri migliori da testare, poi in contemporanea abbiamo utilizzato 150 e 200 epoche in ambienti diversi ma con gli stessi parametri. Abbiamo però visto che i risultati sono identici, ciò significa che si arriva a convergenza entro le 150 epoche, su colab infatti il training si ferma a 122. Successivamente abbiamo incaricato un solo membro per la labellizzazione per una coerenza nel criterio e abbiamo scelto un altro dataset. Questo ha portato a risultati migliori, abbiamo provato con 150 e 200 epoche ma non raggiungeva la convergenza entro le 150, infatti nella 200 la raggiunge verso la 168. Abbiamo notato un'ottima detection delle powerlines ma scarsa nei bushes.
 ```bash
 # Dataset 1
 yolo detect train   model=yolo11s.pt data=/content/datasets/Powerlines-Detection---YOLO--2/data.yaml   imgsz=1024 batch=8 epochs=200 patience=50 mosaic=0.2 fliplr=0.5 erasing=0.4   project=runs/detect name=train_ds1
