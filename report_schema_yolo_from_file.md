@@ -231,7 +231,7 @@ Anche la classe powerline tower, che ricordiamo avere solamente poche istanze al
 L'analisi di quest'ultimo ciclo di addestramento porta a una duplice conclusione. In primo luogo, emerge con chiarezza come il limite prestazionale riscontrato su determinate classi sia direttamente correlato all'esiguità delle istanze presenti nel dataset. In secondo luogo, i risultati dimostrano l'importanza cruciale dell'addestramento prolungato: l'impiego di un maggior numero di epoche ha fornito un contributo significativo al training finale. Questo ha permesso al modello di affinare progressivamente le sue capacità di rilevamento e localizzazione, con classi che hanno mostrato un perfezionamento metrico quasi a ogni epoca successiva.
 
 ## Utilizzo di Colab
-Se l'ambiente WSL è stato impiegato per un'analisi preliminare e per validare l'impatto di un addestramento prolungato (da 10 a 150 epoche) a risoluzione standard, l'ambiente cloud Google Colab è stato scelto per la fase di addestramento finale e il confronto sistematico dei dataset.
+Se l'ambiente WSL è stato impiegato per un'analisi preliminare e per validare l'impatto di un addestramento prolungato (da 10 a 200 epoche) a risoluzione standard, l'ambiente cloud Google Colab è stato scelto per la fase di addestramento finale e il confronto sistematico dei dataset.
 L'adozione di Colab, e in particolare delle sue istanze con GPU NVIDIA (come la Tesla T4), ha offerto due vantaggi strategici:
 
 - **Creazione e accesso alla directory di progetto:**
@@ -263,6 +263,19 @@ project = rf.workspace("yolo-q4za7").project("powerline-detection-v2-0-yolo-oh4i
 version = project.version(3)
 dataset = version.download("yolov11")
 ```
+
+Di seguito la tabella riassuntiva del training del modello (ds1): 
+| Classe | Immagini | Istanze | Precision (P) | Recall (R) | mAP50 | mAP50-95 |
+|:---|---:|---:|---:|---:|---:|---:|
+| **all** | **20** | **200** | **0.81** | **0.74** | **0.747** | **0.47** |
+| bushes | 20 | 34 | 0.755 | 0.735 | 0.761 | 0.477 |
+| dirt | 15 | 20 | 0.714 | 0.65 | 0.606 | 0.386 |
+| powerline | 20 | 94 | 0.932 | 0.868 | 0.919 | 0.553 |
+| powerline tower | 7 | 9 | 0.855 | 0.656 | 0.709 | 0.42 |
+| trees | 20 | 43 | 0.795 | 0.791 | 0.738 | 0.518 |
+
+L'analisi si è fermata all'epoca 122, se i risultati non cambiano entro 50 epoche si suppone si sia raggiunta la convergenza e ci fermiamo con le epoche, si può vedere nel parametro "patience = 50".
+
 ### Addestramento Finale Ottimizzato (ds2)
 L'addestramento su Colab è stato il culmine del processo di ottimizzazione. Sulla base delle analisi preliminari, è stato utilizzato il modello yolo11s.pt ma con un prompt di addestramento significativamente più complesso e ottimizzato, mirato a massimizzare l'accuratezza con immagini ad alta risoluzione.
 
@@ -280,6 +293,18 @@ Il comando seguente mostra la configurazione finale, che include non solo un num
   amp=True plots=True val=True \
   project=runs/detect name=train_powerline_v2
 ```
+
+Di seguito la tabella riassuntiva del training del modello (ds2): 
+| Classe | Immagini | Istanze | Precision (P) | Recall (R) | mAP50 | mAP50-95 |
+|:---|---:|---:|---:|---:|---:|---:|
+| **all** | **20** | **200** | **0.848** | **0.697** | **0.757** | **0.482** |
+| bushes | 20 | 34 | 0.861 | 0.73 | 0.788 | 0.459 |
+| dirt | 15 | 20 | 0.771 | 0.5 | 0.601 | 0.41 |
+| powerline | 20 | 94 | 0.987 | 0.862 | 0.962 | 0.578 |
+| powerline tower | 7 | 9 | 0.76 | 0.667 | 0.607 | 0.356 |
+| trees | 20 | 43 | 0.862 | 0.729 | 0.827 | 0.605 |
+
+Qui ci siamo fermati all'epoca 168.
 
 Analizzando in maniera dettagliata i parametri passati tramite prompt notiamo: 
 - epochs=200 imgsz=1024:
@@ -299,7 +324,30 @@ Come le metriche dimostrano in modo inconfutabile, questa configurazione ha port
 - mAP@50-95: 74.7%
 - Recall: 100.0%
 
-Il confronto con i risultati del ds1 (addestrato nel medesimo ambiente Colab) conferma la tesi centrale: l'effetto combinato di un dataset di alta qualità (ds2) e di un addestramento iper-parametrizzato ad alta risoluzione (reso possibile da Colab) è stato determinante per superare le criticità iniziali (come la bassa mAP@50-95 per le powerline) e raggiungere un livello di accuratezza operativa.
+
+A livello aggregato il DS2 ottiene un punteggio mAP50 (75.7%) e mAP50-95 (48.2%) marginalmente superiori rispetto al DS1 (74.7% e 47.0% rispettivamente).
+
+Tuttavia, si nota un'inversione nel bilanciamento Precision/Recall:
+
+DS1: Ha una Recall migliore (74.0%), il che suggerisce che è più abile a trovare tutti gli oggetti presenti (meno falsi negativi).
+
+DS2: Ha una Precisione nettamente superiore (84.8% contro 81.0%), indicando che i suoi rilevamenti sono più affidabili (meno falsi positivi).
+
+In sintesi, il DS2 si dimostra un modello leggermente più preciso, a scapito di una piccola perdita nella capacità di identificare ogni singola istanza.
+
+La vera differenza tra i due addestramenti emerge dall'analisi delle classi fondamentali del progetto:
+
+Powerline (Cavi Elettrici): Il DS2 supera nettamente il DS1. Le prestazioni su questa classe, la più critica per il progetto, sono decisamente migliori. La mAP50 passa da un buon 91.9% a un eccellente 96.2%, e la Precisione raggiunge quasi la perfezione (98.7%). Questo indica che il DS2 è molto più affidabile nell'identificazione corretta dei cavi.
+
+Trees (Alberi): Similmente ai cavi, il DS2 mostra un notevole miglioramento anche nel riconoscimento degli alberi. La mAP50 aumenta di quasi 9 punti (da 73.8% a 82.7%) e la mAP50-95 (la metrica più difficile) cresce da 51.8% a 60.5%.
+
+Powerline tower (Tralicci): Qui si osserva il trade-off più evidente. Il miglioramento sulle altre classi è avvenuto a scapito del riconoscimento dei tralicci. Il DS1 era sorprendentemente più competente su questa classe, con una mAP50 del 70.9%. Nel DS2, questa metrica crolla a 60.7%. È plausibile che il DS2, nell'affinare la sua capacità di distinguere cavi e alberi, abbia iniziato a generare più confusione o a mancare i tralicci.
+
+Bushes e dirt: Le prestazioni su queste classi secondarie sono miste e non mostrano variazioni determinanti, con lievi vantaggi e svantaggi per entrambi i modelli.
+
+TL'addestramento ha portato a un peggioramento significativo nella classe powerline tower. Questo fenomeno di "regressione" su una classe mentre se ne migliora un'altra è un risultato fondamentale: dimostra che, sebbene il DS2 sia il modello da utilizzare per l'inferenza sui cavi, il dataset ha ancora margini di miglioramento per raggiungere un equilibrio tra tutte le classi di interesse.
+
+I motivi sono riconducibili alla labellizzazione. Il primo dataset è stato fatto da 3 persone, con ognuno mano diversa e quindi modi di etichettare le classi più o meno precisi. Il secondo dataset da una singola persona che quindi ha mantenuto coerenza nel labeling. I due dataset sono stati creati su immagini diverse e deve essere attenzionata anche questo fatto.
 
 **Figure principali**
 
