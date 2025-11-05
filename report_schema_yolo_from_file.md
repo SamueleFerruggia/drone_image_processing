@@ -7,6 +7,25 @@ Una fase cruciale del progetto è stata l'ottimizzazione dei parametri di addest
 La parte finale della tesi è dedicata a un'analisi comparativa: vengono messi a confronto i risultati ottenuti da due diverse tipologie di dataset, testati utilizzando una configurazione di rilevamento stabile.
 Il lavoro si conclude con una riflessione sui possibili sviluppi futuri di questo approccio.
 
+## Dataset
+L’obbiettivo principale della nostra tesina è l’analisi di immagini acquisite tramite droni in aree boschive, con un focus specifico sull’individuazione di tralicci e linee dell’alta tensione, nonché sull’individuaizone di alberi in prossimità di questi ultimi. 
+Per specializzare un modello di object detection come YOLO a eseguire questo specifico task, non è sufficiente utilizzare i modelli pre-addestrati generici, ma è necessario eseguire un processo che prende il nome di fine-tuning. 
+Tramite il fine-tuning si adatta la rete neurale a compiere un nuovo compito più specifico. Invece di addestrare il modello da zero si utilizzano pesi già addestrati come base di partenza. Vengono quindi addestati gli strati finali della rete per imparare a riconoscere le classi di interesse, nel nostro caso le linee dell’alta tensione e i possibili alberi pericolosi. 
+Durante la prima fase del progetto è stato quindi necessario ricercare un dataset che rispettasse le seguenti caratteristiche: 
+
+- riprese dall’alto effettuate tramite droni
+- immagini di alta qualità in cui fosse possibile individuare le linee dell’alta tensione  e la presenza di alberi nei dintorni
+- immagini a differenti livelli di luminosità (immagini diurne, immagini serali)
+
+La ricerca a quindi portato all’utilizzo dei seguenti due dataset: 
+
+- **Dataset 1 (ds1)** :
+    - vegetazione chiara
+    - immagini diurne
+- **Dataset 2 (ds2)** :
+    - vegetazione scura
+    - immagini serali
+
 ## Computer Vision: Edge detection
 
 L'obiettivo iniziale del progetto è stato individuare i cavi dell'alta tensione (powerline) in immagini scattate da droni in area boschiva, sfruttando algoritmi di Edge Detection per estrarre i dettagli più sottili (ovvero linee bianche, sottili sullo sfondo).
@@ -55,10 +74,8 @@ L'applicazione della pipeline ha restituito mappe di edge precise dove i cavi so
 
 ![](./Edge%20Detection/output/train/FILTER_6_FINAL_EDGES/_DSC4207_final.jpg)
 
-## Dataset
-- **ds1 (vegetazione chiara)**: immagini eterogenee; labeling su **Roboflow** fatto da **3 persone** (suddivisione delle immagini).
-- **ds2 (vegetazione scura)**: nuova raccolta; labeling **centralizzato** da **1 persona** per uniformare criteri e classi (stessa tassonomia).
-### Roboflow
+
+## Roboflow
 Uno dei problemi principali nel processo di addestramento del modello è stato riscontrato durante la fase di preparazione del dataset, in particolare l'annotazione delle immagini. Questa operazione, sebbene cruciale, è notoriamente dispendiosa in termini di tempo e soggetta a errori.
 Inizialmente, si era pensato di utilizzare uno strumento manuale tradizionale come LabelImg. Quest'ultimo è un software desktop open source leggero ed efficace, ampiamente utilizzato per creare bounding box e salvarli in formati come Pascal VOC o YOLO TXT.
 Tuttavia, attuando una ricerca più approfondita nello stato dell'arte dei software di data management per la computer vision, è stata individuata la piattaforma Roboflow. La scelta è ricaduta su quest'ultima in quanto risolveva molteplici criticità che uno strumento locale come LabelImg non è progettato per indirizzare.
@@ -112,8 +129,6 @@ Esempio data.yaml:
 - **imgsz**: **1024** (train/val)
 - **batch**: **8**
 - Resize/letterbox gestiti da Ultralytics in fase di training.
-
-
 
 
 ## Yolo
