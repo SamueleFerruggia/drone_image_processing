@@ -231,7 +231,7 @@ Anche la classe powerline tower, che ricordiamo avere solamente poche istanze al
 L'analisi di quest'ultimo ciclo di addestramento porta a una duplice conclusione. In primo luogo, emerge con chiarezza come il limite prestazionale riscontrato su determinate classi sia direttamente correlato all'esiguità delle istanze presenti nel dataset. In secondo luogo, i risultati dimostrano l'importanza cruciale dell'addestramento prolungato: l'impiego di un maggior numero di epoche ha fornito un contributo significativo al training finale. Questo ha permesso al modello di affinare progressivamente le sue capacità di rilevamento e localizzazione, con classi che hanno mostrato un perfezionamento metrico quasi a ogni epoca successiva.
 
 ## Utilizzo di Colab
-Se l'ambiente WSL è stato impiegato per un'analisi preliminare e per validare l'impatto di un addestramento prolungato (da 10 a 200 epoche) a risoluzione standard, l'ambiente cloud Google Colab è stato scelto per la fase di addestramento finale e il confronto sistematico dei dataset.
+Se l'ambiente WSL è stato impiegato per un'analisi preliminare e per validare l'impatto di un addestramento prolungato (da 10 a 150 epoche) a risoluzione standard, l'ambiente cloud Google Colab è stato scelto per la fase di addestramento finale e il confronto sistematico dei dataset.
 L'adozione di Colab, e in particolare delle sue istanze con GPU NVIDIA (come la Tesla T4), ha offerto due vantaggi strategici:
 
 - **Creazione e accesso alla directory di progetto:**
@@ -353,35 +353,131 @@ I motivi sono riconducibili alla labellizzazione. Il primo dataset è stato fatt
 
 ![](report_assets/report_assets/ds1_PR_curve.png)
 
+Questo grafico è il principale indicatore delle prestazioni. Il modello raggiunge una mAP@0.5 complessiva (per tutte le classi) di 0.755. L'andamento per singola classe è tuttavia molto eterogeneo:
+
+La classe powerline (mAP 0.950) è di gran lunga la più performante. La sua curva si mantiene alta e vicina all'angolo "perfetto" (1.0 P, 1.0 R), indicando un rilevamento estremamente affidabile.
+
+Le classi dirt (mAP 0.626) e powerline tower (mAP 0.630) sono le più deboli, mostrando un rapido degrado della precisione all'aumentare della recall.
+
+trees (0.807) e bushes (0.763) si attestano su prestazioni discrete.
+
 ![](report_assets/report_assets/ds1_F1_curve.png)
+
+La curva F1 bilancia Precisione e Recall. Questo grafico è fondamentale per determinare la soglia di confidenza operativa ottimale.
+
+Il punteggio F1 massimo per tutte le classi è 0.77, raggiunto a una soglia di confidenza di 0.624. Questo valore rappresenta il miglior trade-off tra Falsi Positivi e Falsi Negativi.
+
+La robustezza della classe powerline (curva verde) è evidente, mantenendo un F1 score elevato (sopra 0.9) in un ampio intervallo di confidenza (circa 0.2-0.75).
+
+Le classi dirt e powerline tower mostrano picchi F1 molto più bassi, confermando la loro difficoltà di rilevamento.
 
 ![](report_assets/report_assets/ds1_P_curve.png)
 
 ![](report_assets/report_assets/ds1_R_curve.png)
 
+Questi due grafici scompongono la curva F1.
+
+La curva P mostra come la precisione aumenti con l'aumentare della confidenza.
+
+La curva R mostra come la recall diminuisca all'aumentare della confidenza. La lettura del valore "at 0.000" è critica: la recall massima del modello è 0.83. Questo indica un limite strutturale: anche con una confidenza pari a zero, il modello non è in grado di rilevare il 17% degli oggetti presenti nel set di validazione.
+
 ![](report_assets/report_assets/ds1_confusion_matrix.png)
 
 ![](report_assets/report_assets/ds1_confusion_matrix_normalized.png)
+
+La matrice di confusione serve a capire come il modello sta sbagliando.
+
+La matrice normalizzata (normalizzata sulle classi "True") è la più chiara. L'errore dominante del modello è la confusione degli oggetti con lo sfondo (ovvero, Falsi Negativi).
+
+La diagonale mostra i successi: powerline (94%), bushes (82%), trees (81%).
+
+Le classi deboli sono confermate: powerline tower (67%) e dirt (60%).
+
+La riga "background" (in basso) quantifica i Falsi Negativi: il modello manca completamente il 40% delle istanze di dirt e il 33% di powerline tower. Anche bushes (18%) e trees (16%) soffrono di un tasso di FN non trascurabile.
+
+Per i Falsi Positivi (oggetti "inventati"), facciamo riferimento alla matrice non normalizzata (ds1_confusion_matrix.png), guardando la colonna "True: background" (l'ultima a destra).
+
+Il modello ha generato 35 Falsi Positivi per la classe trees.
+
+Ha generato 15 Falsi Positivi per powerline e 11 per dirt.
+
+Questo indica una chiara tendenza del modello a rilevare oggetti dove non esistono, il che spiega perché la precisione per classi come trees (vista nella curva PR) non sia vicina alla perfezione come quella di powerline.
 
 ![](report_assets/report_assets/ds1_val_batch0_labels.jpg)
 
 ![](report_assets/report_assets/ds1_val_batch0_pred.jpg)
 
+L'ispezione visiva dei batch di validazione convalida le metriche quantitative:
+
+powerline (box bianchi): Il confronto tra labels (Verità) e preds (Predizioni) è quasi perfetto. Il modello rileva le linee elettriche con precisione e confidenza elevate (es. 0.9, 0.8), confermando la mAP di 0.950.
+
+bushes (box blu): Le predizioni per bushes mostrano spesso una confidenza medio-bassa (es. 0.5, 0.3, 0.4). Questo conferma l'incertezza del modello su questa classe.
+
+Errori Visibili: Nell'immagine in alto a sinistra, le labels mostrano due istanze di dirt (box ciano). Le preds ne rilevano correttamente solo una (dirt 0.9), mancando la seconda. Questo è un esempio visivo del 40% di Falsi Negativi per la classe dirt evidenziato dalla matrice di confusione.
+
+powerline tower (box ciano-verde): Nell'immagine in alto (seconda da sinistra), il traliccio viene rilevato con confidenza massima (powerline tower 1.0), ma sappiamo dalle metriche che il modello non è così consistente, mancando il 33% di questa classe.
+
 ![](report_assets/report_assets/ds2_PR_curve.png)
 
+Il modello raggiunge una mAP@0.5 complessiva (per tutte le classi) di 0.758. L'andamento per singola classe è tuttavia molto eterogeneo:
+
+La classe powerline (mAP 0.951) è di gran lunga la più performante. La sua curva si mantiene alta e vicina all'angolo "perfetto" (1.0 P, 1.0 R), indicando un rilevamento estremamente affidabile.
+
+Le classi dirt (mAP 0.659) e powerline tower (mAP 0.596) sono le più deboli, mostrando un rapido degrado della precisione all'aumentare della recall.
+
+trees (0.820) e bushes (0.762) si attestano su prestazioni discrete.
+
 ![](report_assets/report_assets/ds2_F1_curve.png)
+
+La curva F1 bilancia Precisione e Recall. Questo grafico è fondamentale per determinare la soglia di confidenza operativa ottimale.
+
+Il punteggio F1 massimo per tutte le classi è 0.77, raggiunto a una soglia di confidenza di 0.198. Questo valore è molto basso e indica che per ottenere il miglior bilanciamento tra Falsi Positivi e Falsi Negativi, si deve accettare una confidenza molto bassa.
+
+La robustezza della classe powerline (curva verde) è evidente, mantenendo un F1 score elevato (sopra 0.9) in un ampio intervallo di confidenza (circa 0.2-0.75).
+
+Le classi dirt e powerline tower mostrano picchi F1 molto più bassi, confermando la loro difficoltà di rilevamento.
 
 ![](report_assets/report_assets/ds2_P_curve.png)
 
 ![](report_assets/report_assets/ds2_R_curve.png)
 
+Questi due grafici scompongono la curva F1.
+
+La curva P mostra come la precisione aumenti con l'aumentare della confidenza.
+
+La curva R mostra come la recall diminuisca all'aumentare della confidenza. La lettura del valore "at 0.000" è critica: la recall massima del modello è 0.80. Questo indica un limite strutturale: anche con una confidenza pari a zero, il modello non è in grado di rilevare il 20% degli oggetti presenti nel set di validazione.
+
 ![](report_assets/report_assets/ds2_confusion_matrix.png)
 
 ![](report_assets/report_assets/ds2_confusion_matrix_normalized.png)
 
+La matrice di confusione serve per capire come il modello sta sbagliando (come detto anche prima nel ds1).
+
+La matrice normalizzata (normalizzata sulle classi "True") è la più chiara. L'errore dominante del modello è la confusione degli oggetti con lo sfondo (ovvero, Falsi Negativi). * La diagonale mostra i successi: powerline (93%), trees (81%), bushes (76%).
+
+Le classi deboli sono confermate: powerline tower (56%) e dirt (60%).
+
+La riga "background" (in basso) quantifica i Falsi Negativi: il modello manca completamente il 44% delle istanze di powerline tower e il 35% di dirt. Anche bushes (24%) e trees (19%) soffrono di un tasso di FN non trascurabile.
+
+Per i Falsi Positivi (oggetti "inventati"), facciamo riferimento alla matrice non normalizzata (ds2_confusion_matrix.png), guardando la colonna "True: background" (l'ultima a destra).
+
+Il modello ha generato 9 Falsi Positivi per la classe powerline, 9 per trees e 7 per bushes.
+
+Questo indica una chiara tendenza del modello a rilevare oggetti dove non esistono, il che spiega perché la precisione per classi come trees (vista nella curva PR) non sia vicina alla perfezione come quella di powerline.
+
 ![](report_assets/report_assets/ds2_val_batch0_labels.jpg)
 
 ![](report_assets/report_assets/ds2_val_batch0_pred.jpg)
+
+L'ispezione visiva dei batch di validazione convalida le metriche quantitative:
+
+powerline (box bianchi): Il confronto tra labels (Verità) e preds (Predizioni) è quasi perfetto. Il modello rileva le linee elettriche con precisione e confidenza elevate (es. 0.9, 0.8), confermando la mAP di 0.951.
+
+bushes (box blu): Le predizioni per bushes mostrano spesso una confidenza medio-bassa (es. 0.5, 0.3, 0.4). Questo conferma l'incertezza del modello su questa classe.
+
+Errori Visibili: Nell'immagine in alto a sinistra, le labels mostrano due istanze di dirt (box ciano). Le preds ne rilevano correttamente solo una (dirt 0.9), mancando la seconda. Questo è un esempio visivo del 35% di Falsi Negativi per la classe dirt evidenziato dalla matrice di confusione.
+
+powerline tower (box ciano-verde): Nell'immagine in alto (seconda da sinistra), il traliccio viene rilevato con confidenza massima (powerline tower 1.0), ma sappiamo dalle metriche che il modello non è così consistente, mancando il 44% di questa classe.
 
 ## Confronto Colab e Linux
 —
