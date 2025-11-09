@@ -188,6 +188,18 @@ durante l’addestramento dalla prima alla decima epoca abbiamo avuto:
 - Precision: 73%
 - Recall: 62%
 
+
+![Curva Precision-Recall (PR)](POWLINE_10Epoches_train/BoxPR_curve.png)
+![Curva F1 Score](POWLINE_10Epoches_train/BoxF1_curve.png)
+![Curva Precisione (P)](POWLINE_10Epoches_train/BoxP_curve.png)
+![Curva Recall (R)](POWLINE_10Epoches_train/BoxR_curve.png)
+![Matrice di confusione](POWLINE_10Epoches_train/confusion_matrix.png)
+![Matrice di confusione normalizzata](POWLINE_10Epoches_train/confusion_matrix_normalized.png)
+![Batch 0 - Labels](POWLINE_10Epoches_train/POWLINE_10Epoches_trainval_batch0_labels.jpg)
+![Batch 0 - Validation](POWLINE_10Epoches_train/val_batch0_pred.jpg)
+
+
+
 L'analisi dettagliata dei risultati dopo le prime 10 epoche di addestramento rivela una performance eterogenea tra le diverse classi, strettamente correlata alla distribuzione delle istanze nel dataset POWLINE.
 Il modello ha dimostrato una rapida capacità di apprendimento per le classi più rappresentate. 
 La classe "trees"  è emersa come la best performer complessiva, raggiungendo alti livelli di precisione in breve tempo. Questo risultato è attribuibile all'elevato numero di istanze presenti nel dataset, che ha permesso al modello di generalizzare efficacemente le caratteristiche visive degli alberi.
