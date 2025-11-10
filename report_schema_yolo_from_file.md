@@ -363,7 +363,7 @@ I motivi sono riconducibili alla labellizzazione. Il primo dataset è stato fatt
 
 **Figure principali**
 
-![](report_assets/report_assets/ds1_PR_curve.png)
+![](image proc/report_assets/report_assets/ds1_PR_curve.png)
 
 Questo grafico è il principale indicatore delle prestazioni. Il modello raggiunge una mAP@0.5 complessiva (per tutte le classi) di 0.755. L'andamento per singola classe è tuttavia molto eterogeneo:
 
@@ -373,7 +373,7 @@ Le classi dirt (mAP 0.626) e powerline tower (mAP 0.630) sono le più deboli, mo
 
 trees (0.807) e bushes (0.763) si attestano su prestazioni discrete.
 
-![](report_assets/report_assets/ds1_F1_curve.png)
+![](image proc/report_assets/report_assets/ds1_F1_curve.png)
 
 La curva F1 bilancia Precisione e Recall. Questo grafico è fondamentale per determinare la soglia di confidenza operativa ottimale.
 
@@ -383,9 +383,9 @@ La robustezza della classe powerline (curva verde) è evidente, mantenendo un F1
 
 Le classi dirt e powerline tower mostrano picchi F1 molto più bassi, confermando la loro difficoltà di rilevamento.
 
-![](report_assets/report_assets/ds1_P_curve.png)
+![](image proc/report_assets/report_assets/ds1_P_curve.png)
 
-![](report_assets/report_assets/ds1_R_curve.png)
+![](image proc/report_assets/report_assets/ds1_R_curve.png)
 
 Questi due grafici scompongono la curva F1.
 
@@ -393,9 +393,9 @@ La curva P mostra come la precisione aumenti con l'aumentare della confidenza.
 
 La curva R mostra come la recall diminuisca all'aumentare della confidenza. La lettura del valore "at 0.000" è critica: la recall massima del modello è 0.83. Questo indica un limite strutturale: anche con una confidenza pari a zero, il modello non è in grado di rilevare il 17% degli oggetti presenti nel set di validazione.
 
-![](report_assets/report_assets/ds1_confusion_matrix.png)
+![](image proc/report_assets/report_assets/ds1_confusion_matrix.png)
 
-![](report_assets/report_assets/ds1_confusion_matrix_normalized.png)
+![](image proc/report_assets/report_assets/ds1_confusion_matrix_normalized.png)
 
 La matrice di confusione serve a capire come il modello sta sbagliando.
 
@@ -415,9 +415,9 @@ Ha generato 15 Falsi Positivi per powerline e 11 per dirt.
 
 Questo indica una chiara tendenza del modello a rilevare oggetti dove non esistono, il che spiega perché la precisione per classi come trees (vista nella curva PR) non sia vicina alla perfezione come quella di powerline.
 
-![](report_assets/report_assets/ds1_val_batch0_labels.jpg)
+![](image proc/report_assets/report_assets/ds1_val_batch0_labels.jpg)
 
-![](report_assets/report_assets/ds1_val_batch0_pred.jpg)
+![](image proc/report_assets/report_assets/ds1_val_batch0_pred.jpg)
 
 L'ispezione visiva dei batch di validazione convalida le metriche quantitative:
 
@@ -429,7 +429,7 @@ Errori Visibili: Nell'immagine in alto a sinistra, le labels mostrano due istanz
 
 powerline tower (box ciano-verde): Nell'immagine in alto (seconda da sinistra), il traliccio viene rilevato con confidenza massima (powerline tower 1.0), ma sappiamo dalle metriche che il modello non è così consistente, mancando il 33% di questa classe.
 
-![](report_assets/report_assets/ds2_PR_curve.png)
+![](image proc/report_assets/report_assets/ds2_PR_curve.png)
 
 Il modello raggiunge una mAP@0.5 complessiva (per tutte le classi) di 0.758. L'andamento per singola classe è tuttavia molto eterogeneo:
 
@@ -439,7 +439,7 @@ Le classi dirt (mAP 0.659) e powerline tower (mAP 0.596) sono le più deboli, mo
 
 trees (0.820) e bushes (0.762) si attestano su prestazioni discrete.
 
-![](report_assets/report_assets/ds2_F1_curve.png)
+![](image proc/report_assets/report_assets/ds2_F1_curve.png)
 
 La curva F1 bilancia Precisione e Recall. Questo grafico è fondamentale per determinare la soglia di confidenza operativa ottimale.
 
@@ -449,9 +449,9 @@ La robustezza della classe powerline (curva verde) è evidente, mantenendo un F1
 
 Le classi dirt e powerline tower mostrano picchi F1 molto più bassi, confermando la loro difficoltà di rilevamento.
 
-![](report_assets/report_assets/ds2_P_curve.png)
+![](image proc/report_assets/report_assets/ds2_P_curve.png)
 
-![](report_assets/report_assets/ds2_R_curve.png)
+![](image proc/report_assets/report_assets/ds2_R_curve.png)
 
 Questi due grafici scompongono la curva F1.
 
@@ -459,9 +459,9 @@ La curva P mostra come la precisione aumenti con l'aumentare della confidenza.
 
 La curva R mostra come la recall diminuisca all'aumentare della confidenza. La lettura del valore "at 0.000" è critica: la recall massima del modello è 0.80. Questo indica un limite strutturale: anche con una confidenza pari a zero, il modello non è in grado di rilevare il 20% degli oggetti presenti nel set di validazione.
 
-![](report_assets/report_assets/ds2_confusion_matrix.png)
+![](image proc/report_assets/report_assets/ds2_confusion_matrix.png)
 
-![](report_assets/report_assets/ds2_confusion_matrix_normalized.png)
+![](image proc/report_assets/report_assets/ds2_confusion_matrix_normalized.png)
 
 La matrice di confusione serve per capire come il modello sta sbagliando (come detto anche prima nel ds1).
 
@@ -477,9 +477,9 @@ Il modello ha generato 9 Falsi Positivi per la classe powerline, 9 per trees e 7
 
 Questo indica una chiara tendenza del modello a rilevare oggetti dove non esistono, il che spiega perché la precisione per classi come trees (vista nella curva PR) non sia vicina alla perfezione come quella di powerline.
 
-![](report_assets/report_assets/ds2_val_batch0_labels.jpg)
+![](image proc/report_assets/report_assets/ds2_val_batch0_labels.jpg)
 
-![](report_assets/report_assets/ds2_val_batch0_pred.jpg)
+![](image proc/report_assets/report_assets/ds2_val_batch0_pred.jpg)
 
 L'ispezione visiva dei batch di validazione convalida le metriche quantitative:
 
