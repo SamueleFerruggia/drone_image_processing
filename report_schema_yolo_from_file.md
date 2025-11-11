@@ -338,81 +338,77 @@ Come le metriche dimostrano in modo inconfutabile, questa configurazione ha port
 
 
 A livello aggregato il DS2 ottiene un punteggio mAP50 (75.7%) e mAP50-95 (48.2%) marginalmente superiori rispetto al DS1 (74.7% e 47.0% rispettivamente).
-
 Tuttavia, si nota un'inversione nel bilanciamento Precision/Recall:
-
-DS1: Ha una Recall migliore (74.0%), il che suggerisce che è più abile a trovare tutti gli oggetti presenti (meno falsi negativi).
-
-DS2: Ha una Precisione nettamente superiore (84.8% contro 81.0%), indicando che i suoi rilevamenti sono più affidabili (meno falsi positivi).
+- DS1: Ha una Recall migliore (74.0%), il che suggerisce che è più abile a trovare tutti gli oggetti presenti (meno falsi negativi).
+- DS2: Ha una Precisione nettamente superiore (84.8% contro 81.0%), indicando che i suoi rilevamenti sono più affidabili (meno falsi positivi).
 
 In sintesi, il DS2 si dimostra un modello leggermente più preciso, a scapito di una piccola perdita nella capacità di identificare ogni singola istanza.
 
 La vera differenza tra i due addestramenti emerge dall'analisi delle classi fondamentali del progetto:
+- Powerline: Il DS2 supera nettamente il DS1.
+    - Le prestazioni su questa classe, la più critica per il progetto, sono decisamente migliori.
+    - La mAP50 passa da un buon 91.9% a un eccellente 96.2%
+    - La Precisione raggiunge quasi la perfezione (98.7%)
+    - Questo indica che il DS2 è molto più affidabile nell'identificazione corretta dei cavi.
 
-Powerline (Cavi Elettrici): Il DS2 supera nettamente il DS1. Le prestazioni su questa classe, la più critica per il progetto, sono decisamente migliori. La mAP50 passa da un buon 91.9% a un eccellente 96.2%, e la Precisione raggiunge quasi la perfezione (98.7%). Questo indica che il DS2 è molto più affidabile nell'identificazione corretta dei cavi.
+- Trees: Similmente ai cavi, il DS2 mostra un notevole miglioramento anche nel riconoscimento degli alberi.
+  - La mAP50 aumenta di quasi 9 punti da 73.8% a 82.7%
+  - La mAP50-95 cresce da 51.8% a 60.5%.
 
-Trees (Alberi): Similmente ai cavi, il DS2 mostra un notevole miglioramento anche nel riconoscimento degli alberi. La mAP50 aumenta di quasi 9 punti (da 73.8% a 82.7%) e la mAP50-95 (la metrica più difficile) cresce da 51.8% a 60.5%.
+- Powerline tower: Qui si osserva il trade-off più evidente.
+    - Il miglioramento sulle altre classi è avvenuto a scapito del riconoscimento dei tralicci.
+    - Il DS1 era sorprendentemente più competente su questa classe, con una mAP50 del 70.9%. Nel DS2, questa metrica crolla a 60.7%.
+    - È plausibile che il DS2, nell'affinare la sua capacità di distinguere cavi e alberi, abbia iniziato a generare più confusione o a mancare i tralicci.
 
-Powerline tower (Tralicci): Qui si osserva il trade-off più evidente. Il miglioramento sulle altre classi è avvenuto a scapito del riconoscimento dei tralicci. Il DS1 era sorprendentemente più competente su questa classe, con una mAP50 del 70.9%. Nel DS2, questa metrica crolla a 60.7%. È plausibile che il DS2, nell'affinare la sua capacità di distinguere cavi e alberi, abbia iniziato a generare più confusione o a mancare i tralicci.
+- Bushes e dirt: Le prestazioni su queste classi secondarie sono miste e non mostrano variazioni determinanti, con lievi vantaggi e svantaggi per entrambi i modelli.
 
-Bushes e dirt: Le prestazioni su queste classi secondarie sono miste e non mostrano variazioni determinanti, con lievi vantaggi e svantaggi per entrambi i modelli.
-
-TL'addestramento ha portato a un peggioramento significativo nella classe powerline tower. Questo fenomeno di "regressione" su una classe mentre se ne migliora un'altra è un risultato fondamentale: dimostra che, sebbene il DS2 sia il modello da utilizzare per l'inferenza sui cavi, il dataset ha ancora margini di miglioramento per raggiungere un equilibrio tra tutte le classi di interesse.
-
-I motivi sono riconducibili alla labellizzazione. Il primo dataset è stato fatto da 3 persone, con ognuno mano diversa e quindi modi di etichettare le classi più o meno precisi. Il secondo dataset da una singola persona che quindi ha mantenuto coerenza nel labeling. I due dataset sono stati creati su immagini diverse e deve essere attenzionata anche questo fatto.
+L'addestramento ha portato a un peggioramento significativo nella classe powerline tower. Questo fenomeno di "regressione" su una classe mentre se ne migliora un'altra è un risultato fondamentale: dimostra che, sebbene il DS2 sia il modello da utilizzare per l'inferenza sui cavi, il dataset ha ancora margini di miglioramento per raggiungere un equilibrio tra tutte le classi di interesse.
+I motivi sono riconducibili alla labellizzazione. Il primo dataset è stato fatto da 3 persone, con ognuno mano diversa e quindi modi di etichettare le classi più o meno precisi. Il secondo dataset da una singola persona che quindi ha mantenuto coerenza nel labeling. I due dataset sono stati creati su immagini diverse e ciò deve essere altresì attenzionato.
 
 **Figure principali**
 
 ![](image%20proc/report_assets/report_assets/ds1_PR_curve.png)
 
-Questo grafico è il principale indicatore delle prestazioni. Il modello raggiunge una mAP@0.5 complessiva (per tutte le classi) di 0.755. L'andamento per singola classe è tuttavia molto eterogeneo:
+Questo grafico è il principale indicatore delle prestazioni: 
+- Il modello raggiunge una mAP@0.5 complessiva di 0.755.
 
-La classe powerline (mAP 0.950) è di gran lunga la più performante. La sua curva si mantiene alta e vicina all'angolo "perfetto" (1.0 P, 1.0 R), indicando un rilevamento estremamente affidabile.
-
-Le classi dirt (mAP 0.626) e powerline tower (mAP 0.630) sono le più deboli, mostrando un rapido degrado della precisione all'aumentare della recall.
-
-trees (0.807) e bushes (0.763) si attestano su prestazioni discrete.
+L'andamento per singola classe è tuttavia molto eterogeneo:
+- La classe powerline (mAP 0.950) è di gran lunga la più performante. La sua curva si mantiene alta e vicina all'angolo "perfetto" (1.0 P, 1.0 R), indicando un rilevamento estremamente affidabile.
+- Le classi dirt (mAP 0.626) e powerline tower (mAP 0.630) sono le più deboli, mostrando un rapido degrado della precisione all'aumentare della recall.
+- trees (0.807) e bushes (0.763) si attestano su prestazioni discrete.
 
 ![](image%20proc/report_assets/report_assets/ds1_F1_curve.png)
 
-La curva F1 bilancia Precisione e Recall. Questo grafico è fondamentale per determinare la soglia di confidenza operativa ottimale.
-
-Il punteggio F1 massimo per tutte le classi è 0.77, raggiunto a una soglia di confidenza di 0.624. Questo valore rappresenta il miglior trade-off tra Falsi Positivi e Falsi Negativi.
-
-La robustezza della classe powerline (curva verde) è evidente, mantenendo un F1 score elevato (sopra 0.9) in un ampio intervallo di confidenza (circa 0.2-0.75).
-
-Le classi dirt e powerline tower mostrano picchi F1 molto più bassi, confermando la loro difficoltà di rilevamento.
+La curva F1 bilancia Precisione e Recall. Questo grafico è fondamentale per determinare la soglia di confidenza operativa ottimale, in particolare:
+- Il punteggio F1 massimo per tutte le classi è 0.77, raggiunto a una soglia di confidenza di 0.624. Questo valore rappresenta il miglior trade-off tra Falsi Positivi e Falsi Negativi.
+- La robustezza della classe powerline (curva verde) è evidente, mantenendo un F1 score elevato (sopra 0.9) in un ampio intervallo di confidenza di circa 0.2-0.75.
+- Le classi dirt e powerline tower mostrano picchi F1 molto più bassi, confermando la loro difficoltà di rilevamento.
 
 ![](image%20proc/report_assets/report_assets/ds1_P_curve.png)
 
 ![](image%20proc/report_assets/report_assets/ds1_R_curve.png)
 
-Questi due grafici scompongono la curva F1.
+Questi due grafici scompongono la curva F1: 
+- La curva P mostra come la precisione aumenti con l'aumentare della confidenza.
+- La curva R mostra come la recall diminuisca all'aumentare della confidenza.
 
-La curva P mostra come la precisione aumenti con l'aumentare della confidenza.
-
-La curva R mostra come la recall diminuisca all'aumentare della confidenza. La lettura del valore "at 0.000" è critica: la recall massima del modello è 0.83. Questo indica un limite strutturale: anche con una confidenza pari a zero, il modello non è in grado di rilevare il 17% degli oggetti presenti nel set di validazione.
+La lettura del valore "at 0.000" è critica: la recall massima del modello è 0.83. Questo indica un limite strutturale: anche con una confidenza pari a zero, il modello non è in grado di rilevare il 17% degli oggetti presenti nel set di validazione.
 
 ![](image%20proc/report_assets/report_assets/ds1_confusion_matrix.png)
 
 ![](image%20proc/report_assets/report_assets/ds1_confusion_matrix_normalized.png)
 
-La matrice di confusione serve a capire come il modello sta sbagliando.
+La matrice di confusione serve a capire come il modello sta sbagliando
 
-La matrice normalizzata (normalizzata sulle classi "True") è la più chiara. L'errore dominante del modello è la confusione degli oggetti con lo sfondo (ovvero, Falsi Negativi).
-
-La diagonale mostra i successi: powerline (94%), bushes (82%), trees (81%).
-
-Le classi deboli sono confermate: powerline tower (67%) e dirt (60%).
-
-La riga "background" (in basso) quantifica i Falsi Negativi: il modello manca completamente il 40% delle istanze di dirt e il 33% di powerline tower. Anche bushes (18%) e trees (16%) soffrono di un tasso di FN non trascurabile.
+La matrice normalizzata (normalizzata sulle classi "True") è la più chiara: 
+- L'errore dominante del modello è la confusione degli oggetti con lo sfondo (ovvero, Falsi Negativi).
+- La diagonale mostra i successi: powerline (94%), bushes (82%), trees (81%).
+- Le classi deboli sono confermate: powerline tower (67%) e dirt (60%).
+. La riga "background" (in basso) quantifica i Falsi Negativi: il modello manca completamente il 40% delle istanze di dirt e il 33% di powerline tower. Anche bushes (18%) e trees (16%) soffrono di un tasso di FN non trascurabile.
 
 Per i Falsi Positivi (oggetti "inventati"), facciamo riferimento alla matrice non normalizzata (ds1_confusion_matrix.png), guardando la colonna "True: background" (l'ultima a destra).
 
-Il modello ha generato 35 Falsi Positivi per la classe trees.
-
-Ha generato 15 Falsi Positivi per powerline e 11 per dirt.
-
+Il modello ha generato 35 Falsi Positivi per la classe trees, mentra ha generato 15 falsi positivi per la classe powerline e 11 per quella dirt. 
 Questo indica una chiara tendenza del modello a rilevare oggetti dove non esistono, il che spiega perché la precisione per classi come trees (vista nella curva PR) non sia vicina alla perfezione come quella di powerline.
 
 ![](image%20proc/report_assets/report_assets/ds1_val_batch0_labels.jpg)
@@ -453,27 +449,24 @@ Le classi dirt e powerline tower mostrano picchi F1 molto più bassi, confermand
 
 ![](image%20proc/report_assets/report_assets/ds2_R_curve.png)
 
-Questi due grafici scompongono la curva F1.
-
-La curva P mostra come la precisione aumenti con l'aumentare della confidenza.
-
-La curva R mostra come la recall diminuisca all'aumentare della confidenza. La lettura del valore "at 0.000" è critica: la recall massima del modello è 0.80. Questo indica un limite strutturale: anche con una confidenza pari a zero, il modello non è in grado di rilevare il 20% degli oggetti presenti nel set di validazione.
+Così come per il dataset ds1, andiamo da analizzare i dati provenienti della curva P e della curva R : 
+- La curva P mostra come la precisione aumenti con l'aumentare della confidenza.
+- La curva R mostra come la recall diminuisca all'aumentare della confidenza.
+- La lettura del valore "at 0.000" è critica: la recall massima del modello è 0.80. Questo indica un limite strutturale per cui anche con una confidenza pari a zero, il modello non è in grado di rilevare il 20% degli oggetti presenti nel set di validazione.
 
 ![](image%20proc/report_assets/report_assets/ds2_confusion_matrix.png)
 
 ![](image%20proc/report_assets/report_assets/ds2_confusion_matrix_normalized.png)
 
-La matrice di confusione serve per capire come il modello sta sbagliando (come detto anche prima nel ds1).
-
-La matrice normalizzata (normalizzata sulle classi "True") è la più chiara. L'errore dominante del modello è la confusione degli oggetti con lo sfondo (ovvero, Falsi Negativi). * La diagonale mostra i successi: powerline (93%), trees (81%), bushes (76%).
+La matrice di confusione per il ds2 ci dice che: 
+- La matrice normalizzata (normalizzata sulle classi "True") è la più chiara. L'errore dominante del modello è la confusione degli oggetti con lo sfondo (ovvero, Falsi Negativi).
+- La diagonale mostra i successi: powerline (93%), trees (81%), bushes (76%).
 
 Le classi deboli sono confermate: powerline tower (56%) e dirt (60%).
+La riga "background" quantifica i Falsi Negativi: il modello manca completamente il 44% delle istanze di powerline tower e il 35% di dirt. Anche bushes (24%) e trees (19%) soffrono di un tasso di FN non trascurabile.
 
-La riga "background" (in basso) quantifica i Falsi Negativi: il modello manca completamente il 44% delle istanze di powerline tower e il 35% di dirt. Anche bushes (24%) e trees (19%) soffrono di un tasso di FN non trascurabile.
-
-Per i Falsi Positivi (oggetti "inventati"), facciamo riferimento alla matrice non normalizzata (ds2_confusion_matrix.png), guardando la colonna "True: background" (l'ultima a destra).
-
-Il modello ha generato 9 Falsi Positivi per la classe powerline, 9 per trees e 7 per bushes.
+Per i Falsi Positivi (oggetti "inventati"), facciamo riferimento alla matrice non normalizzata (ds2_confusion_matrix.png), guardando la colonna "True: background" (l'ultima a destra):
+- Il modello ha generato 9 Falsi Positivi per la classe powerline, 9 per trees e 7 per bushes.
 
 Questo indica una chiara tendenza del modello a rilevare oggetti dove non esistono, il che spiega perché la precisione per classi come trees (vista nella curva PR) non sia vicina alla perfezione come quella di powerline.
 
@@ -482,25 +475,22 @@ Questo indica una chiara tendenza del modello a rilevare oggetti dove non esisto
 ![](image%20proc/report_assets/report_assets/ds2_val_batch0_pred.jpg)
 
 L'ispezione visiva dei batch di validazione convalida le metriche quantitative:
-
-powerline (box bianchi): Il confronto tra labels (Verità) e preds (Predizioni) è quasi perfetto. Il modello rileva le linee elettriche con precisione e confidenza elevate (es. 0.9, 0.8), confermando la mAP di 0.951.
-
-bushes (box blu): Le predizioni per bushes mostrano spesso una confidenza medio-bassa (es. 0.5, 0.3, 0.4). Questo conferma l'incertezza del modello su questa classe.
+- powerline (box bianchi): Il confronto tra labels (Verità) e preds (Predizioni) è quasi perfetto. Il modello rileva le linee elettriche con precisione e confidenza elevate (es. 0.9, 0.8), confermando la mAP di 0.951.
+- bushes (box blu): Le predizioni per bushes mostrano spesso una confidenza medio-bassa (es. 0.5, 0.3, 0.4). Questo conferma l'incertezza del modello su questa classe.
 
 Errori Visibili: Nell'immagine in alto a sinistra, le labels mostrano due istanze di dirt (box ciano). Le preds ne rilevano correttamente solo una (dirt 0.9), mancando la seconda. Questo è un esempio visivo del 35% di Falsi Negativi per la classe dirt evidenziato dalla matrice di confusione.
 
-powerline tower (box ciano-verde): Nell'immagine in alto (seconda da sinistra), il traliccio viene rilevato con confidenza massima (powerline tower 1.0), ma sappiamo dalle metriche che il modello non è così consistente, mancando il 44% di questa classe.
+- powerline tower (box ciano-verde): Nell'immagine in alto (seconda da sinistra), il traliccio viene rilevato con confidenza massima (powerline tower 1.0), ma sappiamo dalle metriche che il modello non è così consistente, mancando il 44% di questa classe.
 
 ## Confronto Colab e Linux
 Per questo progetto, la pipeline di addestramento è stata implementata su due ambienti distinti, Windows Subsystem for Linux (WSL) e Google Colab, che hanno ricoperto ruoli diversi ma complementari.
 
-L'ambiente WSL è stato impiegato per la fase di analisi preliminare e proof-of-concept. Il suo vantaggio primario è la capacità di sfruttare l'accelerazione hardware della GPU NVIDIA locale in un ambiente Linux integrato, senza la complessità di una virtual machine. Questo setup, sebbene richieda una configurazione manuale più complessa (creazione di ambienti virtuali, installazione di dipendenze CUDA), si è rivelato ideale per i primi test a risoluzione standard (imgsz=640). Le esecuzioni a 10 e 150 epoche su WSL sono state cruciali per una diagnosi iniziale, confermando la rapida capacità di apprendimento del modello e l'importanza critica di un addestramento prolungato per migliorare le metriche (es. mAP50-95 passata da 39.8% a 50.7%).
+L'ambiente WSL è stato impiegato per la fase di analisi preliminare e proof-of-concept. Il suo vantaggio primario è la capacità di sfruttare l'accelerazione hardware della GPU NVIDIA locale in un ambiente Linux integrato, senza la complessità di una virtual machine. Questo setup, sebbene richieda una configurazione manuale più complessa, quali la creazione di ambienti virtuali e l'installazione di dipendenze CUDA, si è rivelato ideale per i primi test a risoluzione standard (imgsz=640). 
+Le esecuzioni a 10 e 150 epoche su WSL sono state cruciali per una diagnosi iniziale, confermando la rapida capacità di apprendimento del modello e l'importanza critica di un addestramento prolungato per migliorare le metriche (es. mAP50-95 passata da 39.8% a 50.7%).
 
 Google Colab, al contrario, è stato scelto come ambiente per la fase di addestramento finale e ottimizzata. I suoi vantaggi strategici sono stati determinanti:
-
-Potenza Computazionale: Colab ha fornito accesso a GPU ad alte prestazioni (es. Tesla T4) che hanno reso possibile l'addestramento ad alta risoluzione (imgsz=1024) per 200 epoche. Questo carico di lavoro era considerato "proibitivo" per l'hardware locale utilizzato con WSL.
-
-Facilità di Configurazione e Riproducibilità: L'ambiente Colab ha richiesto un setup minimo (installazione via pip) ed ha permesso un'integrazione programmatica diretta con Roboflow, garantendo una maggiore standardizzazione e riproducibilità degli esperimenti finali.
+- Potenza Computazionale: Colab ha fornito accesso a GPU ad alte prestazioni (es. Tesla T4) che hanno reso possibile l'addestramento ad alta risoluzione (imgsz=1024) per 200 epoche. Questo carico di lavoro era considerato "proibitivo" per l'hardware locale utilizzato con WSL.
+- Facilità di Configurazione e Riproducibilità: L'ambiente Colab ha richiesto un setup minimo (installazione via pip) ed ha permesso un'integrazione programmatica diretta con Roboflow, garantendo una maggiore standardizzazione e riproducibilità degli esperimenti finali.
 
 In sintesi, mentre WSL è servito come ambiente di sviluppo e validazione iniziale per esperimenti rapidi a bassa risoluzione, Colab è stato l'ambiente di "produzione" che ha permesso di eseguire gli addestramenti finali, computazionalmente intensivi e ad alta risoluzione, necessari per il confronto sistematico dei dataset e la generazione dei risultati definitivi del progetto.
 
@@ -526,9 +516,6 @@ yolo detect train   model=yolo11s.pt data=/content/datasets/Powerline-detection-
 | mAP@50    | 75.5% | 99.5% | +24.0 pp |
 | mAP@50–95 | 48.3% | 74.7% | +26.4 pp |
 
-
-## Stima altezza
-—
 
 ## Sviluppi futuri
 - Standardizzare il **protocollo di labeling** (QA incrociata 10–20%).
