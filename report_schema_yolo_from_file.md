@@ -417,13 +417,8 @@ Questo indica una chiara tendenza del modello a rilevare oggetti dove non esisto
 
 L'ispezione visiva dei batch di validazione convalida le metriche quantitative:
 
-powerline (box bianchi): Il confronto tra labels (Verità) e preds (Predizioni) è quasi perfetto. Il modello rileva le linee elettriche con precisione e confidenza elevate (es. 0.9, 0.8), confermando la mAP di 0.950.
-
-bushes (box blu): Le predizioni per bushes mostrano spesso una confidenza medio-bassa (es. 0.5, 0.3, 0.4). Questo conferma l'incertezza del modello su questa classe.
-
-Errori Visibili: Nell'immagine in alto a sinistra, le labels mostrano due istanze di dirt (box ciano). Le preds ne rilevano correttamente solo una (dirt 0.9), mancando la seconda. Questo è un esempio visivo del 40% di Falsi Negativi per la classe dirt evidenziato dalla matrice di confusione.
-
-powerline tower (box ciano-verde): Nell'immagine in alto (seconda da sinistra), il traliccio viene rilevato con confidenza massima (powerline tower 1.0), ma sappiamo dalle metriche che il modello non è così consistente, mancando il 33% di questa classe.
+Il confronto tra labels (verità) e preds (predizioni) per le powerlines è quasi perfetto. Il modello rileva le linee elettriche con precisione e confidenza elevate (es. 0.9, 0.8), confermando la mAP di 0.950. Per i cespugli (bushes) le predizioni mostrano spesso una confidenza medio-bassa (es. 0.5, 0.3, 0.4). Questo conferma l'incertezza del modello su questa classe.
+Nell'immagine in alto a sinistra, le labels mostrano due istanze di dirt (box ciano). Le preds ne rilevano correttamente solo una (dirt 0.9), mancando la seconda. Questo è un esempio visivo del 40% di Falsi Negativi per la classe dirt evidenziato dalla matrice di confusione. Nell'immagine in alto (seconda da sinistra), il traliccio viene rilevato con confidenza massima (powerline tower 1.0), ma sappiamo dalle metriche che il modello non è così consistente, mancando il 33% di questa classe.
 
 ![](image proc/report_assets/report_assets/ds2_PR_curve.png)
 
@@ -502,6 +497,12 @@ yolo detect train   model=yolo11s.pt data=/content/datasets/Powerlines-Detection
 # Dataset 2
 yolo detect train   model=yolo11s.pt data=/content/datasets/Powerline-detection-V2.0---YOLO-3/data.yaml   imgsz=1024 batch=8 epochs=200 patience=50 mosaic=0.2 fliplr=0.5 erasing=0.4   project=runs/detect name=train_ds2
 ```
+
+## Applicazione degli algoritmi su video
+
+Adesso diamo una opinione più qualitativa e soggettiva degli algoritmi usati su un video, gli algoritmi sono stati utilizzati su 2 video. 
+L'algoritmo linux su 150 epoche è stato utilizzato sul video da cui abbiamo estratto i frame per il training e i test set. L'obiettivo era verificare il corretto funzionamento dell'algoritmo, essendo che prendiamo i dati del training anche come video test ci aspettavamo una precisione assoluta ed effettivamente l'algoritmo funziona molto bene, questo significa che è andato tutto bene.
+L'algoritmo colab su 200 epoche è equivalente a quello linux essendo che entrambi hanno gli stessi parametri e fanno early stopping prima delle 150 epoche, la differenza quindi è solo nel video. Provando quindi a testarlo su un video inedito osserviamo che individua bene le powerline tower, qualche volta anche le powerline, meno bene per bushes e trees. Quello che possiamo notare è che riconosce bene le powerline quando il frame corrispondente assomiglia a quello di training, una minima divergenza di colore del terreno o degli alberi porta l'algoritmo a confondersi. Questo probabilmente è dovuto dal piccolo dataset utilizzato, 100 immagini tra training e test è troppo poco per addestrare l'algoritmo. Dai test fatti però abbiamo notato che incaricare una singola persona del labeling aumenta la coerenza tra le immagini labelizzate e riduce la confusione che può avere l'algoritmo. La scelta migliore sarebbe aumentare il pool a 500-1000 immagini ma è molto dispendioso per una singola persona da fare.
 
 ## Metodologie possibili per l'object detection
 - **Detection + Edge/Hough** come post-processing per strutture sottili.
