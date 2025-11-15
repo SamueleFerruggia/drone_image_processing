@@ -354,7 +354,6 @@ Analizzando in maniera dettagliata i parametri passati tramite prompt notiamo:
 Questo addestramento ottimizzato, applicato al Dataset 2, ha prodotto i risultati quantitativi discussi nel report. Le metriche e i grafici di performance (visibili nelle "Figure principali") e i dati della tabella di "Confronto finale" derivano direttamente da questa esecuzione su Colab.
 
 Come le metriche dimostrano in modo inconfutabile, questa configurazione ha portato a performance di eccellenza:
-
 - mAP@50: 99.5%
 - mAP@50-95: 74.7%
 - Recall: 100.0%
@@ -362,7 +361,6 @@ Come le metriche dimostrano in modo inconfutabile, questa configurazione ha port
 
 A livello aggregato il DS2 ottiene un punteggio mAP50 (75.7%) e mAP50-95 (48.2%) marginalmente superiori rispetto al DS1 (74.7% e 47.0% rispettivamente).
 Tuttavia, si nota un'inversione nel bilanciamento Precision/Recall:
-
 - DS1: Ha una Recall migliore (74.0%), il che suggerisce che è più abile a trovare tutti gli oggetti presenti (meno falsi negativi).
 - DS2: Ha una Precisione nettamente superiore (84.8% contro 81.0%), indicando che i suoi rilevamenti sono più affidabili (meno falsi positivi).
 
@@ -513,13 +511,12 @@ Errori Visibili: Nell'immagine in alto a sinistra, le labels mostrano due istanz
 
 ## Confronto Colab e Linux
 
-Per questo progetto, la pipeline di addestramento è stata implementata su due ambienti distinti, Windows Subsystem for Linux (WSL) e Google Colab, che hanno ricoperto ruoli diversi ma complementari.
+Per questo progetto, la pipeline di addestramento è stata implementata su due ambienti distinti, Windows Subsystem for Linux (tramite WSL) e Google Colab, che hanno ricoperto ruoli diversi ma complementari.
 
-L'ambiente WSL è stato impiegato per la fase di analisi preliminare e proof-of-concept. Il suo vantaggio primario è la capacità di sfruttare l'accelerazione hardware della GPU NVIDIA locale in un ambiente Linux integrato, senza la complessità di una virtual machine. Questo setup, sebbene richieda una configurazione manuale più complessa, quali la creazione di ambienti virtuali e l'installazione di dipendenze CUDA, si è rivelato ideale per i primi test a risoluzione standard (imgsz=640). 
+L'ambiente WSL è stato impiegato per la fase di analisi preliminare e proof-of-concept. Il suo vantaggio primario è la capacità di sfruttare l'accelerazione hardware della GPU NVIDIA locale in un ambiente Linux integrato, senza la complessità di una virtual machine. Questo setup, sebbene richieda una configurazione manuale più complessa, quali la creazione di ambienti virtuali e l'installazione di dipendenze CUDA, si è rivelato ideale per i primi test a risoluzione standard dove il trainingi era su formato imgsz=640. 
 Le esecuzioni a 10 e 150 epoche su WSL sono state cruciali per una diagnosi iniziale, confermando la rapida capacità di apprendimento del modello e l'importanza critica di un addestramento prolungato per migliorare le metriche (es. mAP50-95 passata da 39.8% a 50.7%).
 
 Google Colab, al contrario, è stato scelto come ambiente per la fase di addestramento finale e ottimizzata. I suoi vantaggi strategici sono stati determinanti:
-
 - Potenza Computazionale: Colab ha fornito accesso a GPU ad alte prestazioni (es. Tesla T4) che hanno reso possibile l'addestramento ad alta risoluzione (imgsz=1024) per 200 epoche. Questo carico di lavoro era considerato "proibitivo" per l'hardware locale utilizzato con WSL.
 - Facilità di Configurazione e Riproducibilità: L'ambiente Colab ha richiesto un setup minimo (installazione via pip) ed ha permesso un'integrazione programmatica diretta con Roboflow, garantendo una maggiore standardizzazione e riproducibilità degli esperimenti finali.
 
@@ -537,15 +534,11 @@ yolo detect train   model=yolo11s.pt data=/content/datasets/Powerline-detection-
 
 ## Applicazione degli algoritmi su video
 
-Adesso diamo una opinione più qualitativa e soggettiva degli algoritmi usati su un video, gli algoritmi sono stati utilizzati su 2 video.
-L'algoritmo linux su 150 epoche è stato utilizzato sul video da cui abbiamo estratto i frame per il training e i test set. L'obiettivo era verificare il corretto funzionamento dell'algoritmo, essendo che prendiamo i dati del training anche come video test ci aspettavamo una precisione assoluta ed effettivamente l'algoritmo funziona molto bene, questo significa che è andato tutto bene.
-L'algoritmo colab su 200 epoche è equivalente a quello linux essendo che entrambi hanno gli stessi parametri e fanno early stopping prima delle 150 epoche, la differenza quindi è solo nel video. Provando quindi a testarlo su un video inedito osserviamo che individua bene le powerline tower, qualche volta anche le powerline, meno bene per bushes e trees. Quello che possiamo notare è che riconosce bene le powerline quando il frame corrispondente assomiglia a quello di training, una minima divergenza di colore del terreno o degli alberi porta l'algoritmo a confondersi. Questo probabilmente è dovuto dal piccolo dataset utilizzato, 100 immagini tra training e test è troppo poco per addestrare l'algoritmo. Dai test fatti però abbiamo notato che incaricare una singola persona del labeling aumenta la coerenza tra le immagini labelizzate e riduce la confusione che può avere l'algoritmo. La scelta migliore sarebbe aumentare il pool a 500-1000 immagini ma è molto dispendioso per una singola persona da fare.
-
-## Metodologie possibili per l'object detection
-
-- **Detection + Edge/Hough** come post-processing per strutture sottili.
-- **Self-training / pseudo-label** su immagini non etichettate.
-- **Cross-dataset** (ds2 su immagini ds1 e viceversa) per valutare la generalizzazione.
+In questa parte del report si pone l'attenzione sulla qualità degli algoritmi utilizzati per la live object detection su video; inoltre, si effettua un'analisi oggettiva dei risultati finali ottenuti dopo la loro applicazione.
+Il primo video presente nel progetto è lo stesso da cui sono stati estratti i frame per il training e il test dell'algoritmo, addestrato per 150 epoche tramite sistema operativo Linux. L'uso di questo video ha avuto come obiettivo la valutazione del corretto funzionamento del fine tuning: l'utilizzo di immagini già impiegate nella fase di training per la successiva fase di testing ha portato, come atteso, al riconoscimento delle istanze con elevata precisione.
+Il secondo video è stato utilizzato per testare la capacità dei modelli di riconoscere elementi su frame mai visti durante l'addestramento. Dai risultati ottenuti nella fase di detection con il modello addestrato per 200 epoche su Colab, notiamo che il riconoscimento di alcune classi risulta migliore rispetto ad altre. In particolare, le classi powerline e powerline tower vengono individuate in maniera ottimale, mentre le classi bushes e trees presentano una precisione minore.
+In conclusione, si nota che il riconoscimento delle powerline è evidentemente migliore quando i frame del video per la live object detection sono simili alle immagini del dataset di training. Una minima divergenza nel colore del terreno o degli alberi induce l'algoritmo in errore, causando una classificazione errata di classi come bushes.
+L'overfitting dei modelli applicati a contesti differenti da quello di training è dovuto inevitabilmente al numero ristretto di immagini a disposizione. Tuttavia, l'etichettatura di un piccolo dataset effettuata da una singola persona può apportare evidenti migliorie al riconoscimento, in quanto la coerenza nelle annotazioni riduce di molto la confusione dell'algoritmo. La strategia migliore risulta essere l'aumento del pool a 700-1000 immagini per il dataset di training. 
 
 ## Confronto finale
 
@@ -568,11 +561,3 @@ L’analisi dei due dataset ha mostrato che la coerenza e la qualità dell’ann
 
 Il processo di data augmentation, il bilanciamento delle classi e l’estensione del numero di epoche di training si sono rivelati strumenti chiave per il miglioramento delle metriche quantitative, con incrementi evidenti nelle curve PR e F1, soprattutto sulle classi maggiormente rappresentate.
 
-## Sviluppi futuri
-
-I risultati raggiunti suggeriscono diverse direzioni per l'ulteriore perfezionamento del sistema:
-
-- Rafforzare la consistenza del labeling attraverso procedure di annotazione collaborative, garantendo uniformità su tutte le classi(QA incrociata 10–20%).
-- Incrementare il numero di istanze delle classi deboli tramite campagne mirate di acquisizione dati.
-- Valutare `yolo11m` e prove a **imgsz=1280** con dataset consolidato.
-- Integrare **edge/Hough** per affinare la localizzazione di cavi sottili.
