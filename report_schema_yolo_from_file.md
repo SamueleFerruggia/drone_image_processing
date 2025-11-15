@@ -562,3 +562,15 @@ L’analisi dei due dataset ha mostrato che la coerenza e la qualità dell’ann
 
 Il processo di data augmentation, il bilanciamento delle classi e l’estensione del numero di epoche di training si sono rivelati strumenti chiave per il miglioramento delle metriche quantitative, con incrementi evidenti nelle curve PR e F1, soprattutto sulle classi maggiormente rappresentate.
 
+## References
+
+Drive google da dove abbiamo preso i dataset:
+https://drive.google.com/drive/folders/1A5omCoTK7Qafml9uX-8i1cEgu7WrOOsY
+
+Tutorial per l'addestramento degli algoritmi di linux e colab:
+https://youtu.be/etjkjZoG2F0?si=zRouZEV3O2t7WA5f
+
+Video con gli algoritmi usati:
+https://www.dropbox.com/scl/fi/j94lst4n65322av3l8xdf/drone_video_v1.avi?rlkey=v0xvons2if5o2o21x1lvt47rl&st=juvzbna8&dl=0
+
+https://www.dropbox.com/scl/fi/1ocxq8a0ch6kiplq7jc00/test_video_processato2.mov?rlkey=1zmphoezjhnihnd3zj16dt656&st=4q5ql5n3&dl=0
