@@ -448,7 +448,7 @@ L'ispezione visiva dei batch di validazione convalida le metriche quantitative:
 Il confronto tra labels (verità) e preds (predizioni) per le powerlines è quasi perfetto. Il modello rileva le linee elettriche con precisione e confidenza elevate (es. 0.9, 0.8), confermando la mAP di 0.950. Per i cespugli (bushes) le predizioni mostrano spesso una confidenza medio-bassa (es. 0.5, 0.3, 0.4). Questo conferma l'incertezza del modello su questa classe.
 Nell'immagine in alto a sinistra, le labels mostrano due istanze di dirt (box ciano). Le preds ne rilevano correttamente solo una (dirt 0.9), mancando la seconda. Questo è un esempio visivo del 40% di Falsi Negativi per la classe dirt evidenziato dalla matrice di confusione. Nell'immagine in alto (seconda da sinistra), il traliccio viene rilevato con confidenza massima (powerline tower 1.0), ma sappiamo dalle metriche che il modello non è così consistente, mancando il 33% di questa classe.
 
-![](image proc/report_assets/report_assets/ds2_PR_curve.png)
+![](image%20proc/report_assets/report_assets/ds2_PR_curve.png)
 
 Il modello raggiunge una mAP@0.5 complessiva (per tutte le classi) di 0.758. L'andamento per singola classe è tuttavia molto eterogeneo:
 
