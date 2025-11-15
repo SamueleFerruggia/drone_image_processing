@@ -207,7 +207,7 @@ durante l’addestramento dalla prima alla decima epoca abbiamo avuto:
 ![Curva Recall (R)](POWLINE_10Epoches_train/BoxR_curve.png)
 ![Matrice di confusione](POWLINE_10Epoches_train/confusion_matrix.png)
 ![Matrice di confusione normalizzata](POWLINE_10Epoches_train/confusion_matrix_normalized.png)
-![Batch 0 - Labels](POWLINE_10Epoches_train/POWLINE_10Epoches_trainval_batch0_labels.jpg)
+![Batch 0 - Labels](POWLINE_10Epoches_train\val_batch0_labels.jpg)
 ![Batch 0 - Validation](POWLINE_10Epoches_train/val_batch0_pred.jpg)
 
 L'analisi dettagliata dei risultati dopo le prime 10 epoche di addestramento rivela una performance eterogenea tra le diverse classi, strettamente correlata alla distribuzione delle istanze nel dataset POWLINE.
