@@ -563,18 +563,24 @@ L’analisi dei due dataset ha mostrato che la coerenza e la qualità dell’ann
 Il processo di data augmentation, il bilanciamento delle classi e l’estensione del numero di epoche di training si sono rivelati strumenti chiave per il miglioramento delle metriche quantitative, con incrementi evidenti nelle curve PR e F1, soprattutto sulle classi maggiormente rappresentate.
 
 ## Materiali utilizzati & References 
+
 Link dropbox video test object detection: 
-- https://www.dropbox.com/scl/fo/ejphwdxtlyf0v920sa9qh/ANw5NjC9LrCLVKly1xfEh2g?rlkey=uzwmv89e1lr6zrv47ec7cebu2&st=wgk58pzw&dl=0
+- `https://www.dropbox.com/scl/fo/ejphwdxtlyf0v920sa9qh/ANw5NjC9LrCLVKly1xfEh2g?rlkey=uzwmv89e1lr6zrv47ec7cebu2&st=wgk58pzw&dl=0`
   
 Drive google dataset sorgenti (senza annotazioni, formato .TIF): 
-- https://drive.google.com/drive/folders/1A5omCoTK7Qafml9uX-8i1cEgu7WrOOsY
+- `https://drive.google.com/drive/folders/1A5omCoTK7Qafml9uX-8i1cEgu7WrOOsY`
     - consigliamo di scaricare la cartella "power-lines-dataset-1.zip"
 
 Dataset Annotati, link roboflow: 
-- dataset 1: https://app.roboflow.com/yolo-q4za7/powerlines-detection-yolo-2-lgnmt/1
-- dataset 2: https://app.roboflow.com/yolo-q4za7/powerline-detection-v2-0-yolo-oh4ia/5
+- dataset 1: 
+  - `https://app.roboflow.com/yolo-q4za7/powerlines-detection-yolo-2-lgnmt/1`
+- dataset 2: 
+  - `https://app.roboflow.com/yolo-q4za7/powerline-detection-v2-0-yolo-oh4ia/5`
 
 Altre risorse: 
-- Video "YOLO11: Train for Object Detection on a Custom Dataset" : https://www.youtube.com/watch?v=etjkjZoG2F0
-- Documentazione Yolo : https://docs.ultralytics.com/quickstart/
-- Documentasione Roboflow: https://docs.roboflow.com/datasets/adding-data
+- Video "YOLO11: Train for Object Detection on a Custom Dataset" : 
+  - `https://www.youtube.com/watch?v=etjkjZoG2F0`
+- Documentazione Yolo : 
+  - `https://docs.ultralytics.com/quickstart/`
+- Documentasione Roboflow: 
+  - `https://docs.roboflow.com/datasets/adding-data`
