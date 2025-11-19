@@ -166,7 +166,7 @@ In questa prima fase di training del modello abbiamo deciso di utilizzare un dat
 Di seguito vengono riportati i passaggi fondamentali eseguiti nel terminale WSL per la configurazione dell'ambiente di training e inferenza:
 
 - **Creazione e accesso alla directory di progetto:**
-    - `mkdir yolov8-trainingcd yolov8-training`
+    - `mkdir yolov8-training`
 - **Installazione del gestore di ambienti virtuali per Python 3.10:**
     - `sudo apt updatesudo apt install python3.10-venv`
 - **Creazione dell'ambiente virtuale:**
@@ -576,6 +576,9 @@ Dataset Annotati, link roboflow:
   - `https://app.roboflow.com/yolo-q4za7/powerlines-detection-yolo-2-lgnmt/1`
 - dataset 2: 
   - `https://app.roboflow.com/yolo-q4za7/powerline-detection-v2-0-yolo-oh4ia/5`
+
+File .sh per addestramento modello tramite WSL: 
+  - `drone_image_processing/setup_yolo.sh`
 
 Link al notebook Colab col codice:
 - `https://colab.research.google.com/drive/17vgMcfKM8hCxEsh6cW1sE6-Zm4D6dm3B#scrollTo=eYDiiuawOxfM`
