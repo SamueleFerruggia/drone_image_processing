@@ -564,8 +564,8 @@ Il processo di data augmentation, il bilanciamento delle classi e l’estensione
 
 ## References
 Link dropbox video test object detection: 
-- https://www.dropbox.com/scl/fo/ejphwdxtlyf0v920sa9qh/ANw5NjC9LrCLVKly1xfEh2g?rlkey=z4kue3b4vhkfnr2n7mc572i7h&st=md89nnc7&dl=0
-
+- https://www.dropbox.com/scl/fo/ejphwdxtlyf0v920sa9qh/ANw5NjC9LrCLVKly1xfEh2g?rlkey=uzwmv89e1lr6zrv47ec7cebu2&st=wgk58pzw&dl=0
+  
 Drive google dataset sorgenti (senza annotazioni, formato .TIF): 
 - https://drive.google.com/drive/folders/1A5omCoTK7Qafml9uX-8i1cEgu7WrOOsY
 
