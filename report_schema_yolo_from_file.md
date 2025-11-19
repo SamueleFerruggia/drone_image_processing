@@ -577,7 +577,10 @@ Dataset Annotati, link roboflow:
 - dataset 2: 
   - `https://app.roboflow.com/yolo-q4za7/powerline-detection-v2-0-yolo-oh4ia/5`
 
-Altre risorse: 
+Link al notebook Colab col codice:
+- `https://colab.research.google.com/drive/17vgMcfKM8hCxEsh6cW1sE6-Zm4D6dm3B#scrollTo=eYDiiuawOxfM`
+
+Altre risorse (references): 
 - Video "YOLO11: Train for Object Detection on a Custom Dataset" : 
   - `https://www.youtube.com/watch?v=etjkjZoG2F0`
 - Documentazione Yolo : 
