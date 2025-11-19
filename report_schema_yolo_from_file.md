@@ -563,14 +563,15 @@ L’analisi dei due dataset ha mostrato che la coerenza e la qualità dell’ann
 Il processo di data augmentation, il bilanciamento delle classi e l’estensione del numero di epoche di training si sono rivelati strumenti chiave per il miglioramento delle metriche quantitative, con incrementi evidenti nelle curve PR e F1, soprattutto sulle classi maggiormente rappresentate.
 
 ## References
+Link dropbox video test object detection: 
+- https://www.dropbox.com/scl/fo/ejphwdxtlyf0v920sa9qh/ANw5NjC9LrCLVKly1xfEh2g?rlkey=z4kue3b4vhkfnr2n7mc572i7h&st=md89nnc7&dl=0
 
-Drive google da dove abbiamo preso i dataset:
-https://drive.google.com/drive/folders/1A5omCoTK7Qafml9uX-8i1cEgu7WrOOsY
+Drive google dataset sorgenti (senza annotazioni, formato .TIF): 
+- https://drive.google.com/drive/folders/1A5omCoTK7Qafml9uX-8i1cEgu7WrOOsY
 
-Tutorial per l'addestramento degli algoritmi di linux e colab:
-https://youtu.be/etjkjZoG2F0?si=zRouZEV3O2t7WA5f
+Dataset Annotati, link roboflow: 
+- dataset 1: https://app.roboflow.com/yolo-q4za7/powerlines-detection-yolo-2-lgnmt/1
+- dataset 2: https://app.roboflow.com/yolo-q4za7/powerline-detection-v2-0-yolo-oh4ia/5
 
-Video con gli algoritmi usati:
-https://www.dropbox.com/scl/fi/j94lst4n65322av3l8xdf/drone_video_v1.avi?rlkey=v0xvons2if5o2o21x1lvt47rl&st=juvzbna8&dl=0
-
-https://www.dropbox.com/scl/fi/1ocxq8a0ch6kiplq7jc00/test_video_processato2.mov?rlkey=1zmphoezjhnihnd3zj16dt656&st=4q5ql5n3&dl=0
+Altre risorse: 
+- Video "YOLO11: Train for Object Detection on a Custom Dataset" : https://www.youtube.com/watch?v=etjkjZoG2F0
